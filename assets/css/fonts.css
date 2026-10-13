@@ -1,0 +1,37 @@
+@font-face {
+    font-family: 'AsenPro';
+    src: url('../fonts/AsenPro-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'AsenPro';
+    src: url('../fonts/AsenPro-Italic.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+}
+
+/* --- THIN --- */
+@font-face {
+    font-family: 'AsenPro';
+    src: url('../fonts/AsenPro-Thin.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+}
+
+/* --- BOLD --- */
+@font-face {
+    font-family: 'AsenPro';
+    src: url('../fonts/AsenPro-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+}
+
+/* --- BLACK (The heaviest) --- */
+@font-face {
+    font-family: 'AsenPro';
+    src: url('../fonts/AsenPro-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+}

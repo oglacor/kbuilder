@@ -1,0 +1,460 @@
+* {
+  box-sizing: border-box;
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: "AsenPro", sans-serif;
+  font-weight: 400;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 190px;
+  height: 80px;
+  background-color: #fff;
+  z-index: 50000;
+}
+header .logo {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+header .logo a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+header .logo img {
+  max-width: 80%;
+  max-height: 80%;
+}
+
+.kbuilder {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+.kbuilder .action-buttons {
+  aspect-ratio: 16/9;
+  width: 100%;
+  max-height: 100vh;
+  z-index: 2;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+.kbuilder .action-buttons button.action-button {
+  position: absolute;
+  background-color: transparent;
+  width: 100px;
+  height: 100px;
+  border: none;
+}
+.kbuilder .action-buttons button.action-button.roof {
+  left: 45%;
+  top: 7%;
+}
+.kbuilder .action-buttons button.action-button.walls {
+  left: 39%;
+  top: 56%;
+}
+.kbuilder .action-buttons button.action-button.window {
+  left: 65%;
+  top: 33%;
+}
+.kbuilder .color-selector-container {
+  z-index: 3;
+  position: fixed;
+  top: 0;
+  right: -240px;
+  width: 240px;
+  height: 100%;
+  transition: all 0.3s ease-out;
+}
+.kbuilder .color-selector-container.active {
+  right: 0;
+}
+.kbuilder .color-selector-container .color-selector-nav {
+  position: absolute;
+  top: 200px;
+  left: -66px;
+  width: 70px;
+  z-index: 10;
+}
+.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button {
+  left: -30px;
+  width: 100px;
+  height: 93px;
+  transform: scale(0.7);
+  transform-origin: right center;
+  background-color: transparent;
+  margin: 10px 0;
+  padding: 0;
+  display: block;
+  position: relative;
+  box-shadow: -5px 0 10px 5px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease-out;
+}
+.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button svg rect.bg {
+  transition: all 0.3s ease-out;
+  fill: #999;
+  stroke: gray;
+  stroke-width: 2px;
+}
+.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button svg path.icon {
+  transition: all 0.3s ease-out;
+  fill: #fff;
+  opacity: 0.5;
+}
+.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button.active {
+  transform: scale(1);
+  box-shadow: -5px 0 5px -5px rgba(0, 0, 0, 0.5);
+}
+.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button.active svg rect.bg {
+  fill: #e91e2f;
+  stroke: #e91e2f;
+  stroke-width: 2px;
+}
+.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button.active svg path.icon {
+  fill: #fff;
+  opacity: 1;
+}
+.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button:hover svg rect.bg {
+  fill: #a31e2f;
+  stroke: #e91e2f;
+  stroke-width: 2px;
+}
+.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button:hover svg path.icon {
+  fill: #fff;
+  opacity: 1;
+}
+.kbuilder .color-selector-container .color-selector {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  padding: 20px;
+  border-left: solid 2px #e91e2f;
+  z-index: 12;
+  box-shadow: -5px 0 10px 5px rgba(0, 0, 0, 0.3);
+  display: none;
+}
+.kbuilder .color-selector-container .color-selector.active {
+  display: block;
+}
+.kbuilder .color-selector-container .color-selector h2.color-selector-title {
+  color: #e91e2f;
+  font-size: 32px;
+  font-weight: 500;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+  align-items: flex-start;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb {
+  width: 100%;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element {
+  display: block;
+  border: solid 2px #999;
+  background-color: #F9FDFE;
+  width: 80px;
+  height: 80px;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.white {
+  background-color: #F9FDFE;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.red {
+  background-color: #e91e2f;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.pink {
+  background-color: #E4007C;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.cobalt {
+  background-color: #0047AB;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.mustard {
+  background-color: #EAC102;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.terracota {
+  background-color: #AD7D60;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.tezontle {
+  background-color: #A55749;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.cantera {
+  background-color: #B6B6B6;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.concrete {
+  background-color: #878883;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.teal {
+  background-color: #00a99d;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.mahogany {
+  background-image: url(../images/mahogany.jpg);
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.golden-oak {
+  background-image: url(../images/oak.jpg);
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.bronze {
+  background-image: url(../images/bronze.jpg);
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.nogal {
+  background-image: url(../images/nogal.jpg);
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.black {
+  background-color: #0D0D0D;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.brown {
+  background-color: #1c1209;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.shiefeld {
+  background-image: url(../images/shiefeld.jpg);
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.silver {
+  background-color: #b3b3b3;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.beige {
+  background-color: #d8cfbd;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb h4.color-name {
+  color: #999;
+  margin: 5px 0 0 0;
+  font-size: 14px;
+  text-align: left;
+  width: 100%;
+  font-weight: 500;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb.selected button.color-element {
+  display: block;
+  border: solid 4px #999;
+  background-color: #F9FDFE;
+  width: 80px;
+  height: 80px;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb.selected h4.color-name {
+  font-weight: 900;
+  color: #0D0D0D;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb:hover button.color-element {
+  border: solid 4px #0D0D0D;
+}
+.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb:hover h4.color-name {
+  color: #0D0D0D;
+}
+.kbuilder .color-selector-container button.color-select-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background-color: #e91e2f;
+  color: white;
+  font-size: 20px;
+  border: solid 2px white;
+  z-index: 15;
+}
+.kbuilder .color-selector-container button.color-select-close svg line {
+  stroke: #F9FDFE;
+  stroke-width: 4px;
+}
+.kbuilder .main-image {
+  aspect-ratio: 16/9;
+  max-height: 100vh;
+}
+.kbuilder .main-image.house-1 svg path, .kbuilder .main-image.house-1 svg polygon {
+  transition: all 1s ease-out;
+}
+.kbuilder .main-image.house-1 svg path.walls-color, .kbuilder .main-image.house-1 svg polygon.walls-color {
+  fill: #e91e2f;
+  mix-blend-mode: multiply;
+}
+.kbuilder .main-image.house-1 svg path.walls-color.white, .kbuilder .main-image.house-1 svg polygon.walls-color.white {
+  fill: #F9FDFE;
+  mix-blend-mode: color;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.walls-color.red, .kbuilder .main-image.house-1 svg polygon.walls-color.red {
+  fill: #e91e2f;
+  mix-blend-mode: multiply;
+  opacity: 0.8;
+}
+.kbuilder .main-image.house-1 svg path.walls-color.pink, .kbuilder .main-image.house-1 svg polygon.walls-color.pink {
+  fill: #E4007C;
+  mix-blend-mode: multiply;
+  opacity: 0.8;
+}
+.kbuilder .main-image.house-1 svg path.walls-color.cobalt, .kbuilder .main-image.house-1 svg polygon.walls-color.cobalt {
+  fill: #0047AB;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.walls-color.mustard, .kbuilder .main-image.house-1 svg polygon.walls-color.mustard {
+  fill: #EAC102;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.walls-color.terracota, .kbuilder .main-image.house-1 svg polygon.walls-color.terracota {
+  fill: #AD7D60;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.walls-color.tezontle, .kbuilder .main-image.house-1 svg polygon.walls-color.tezontle {
+  fill: #A55749;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.walls-color.cantera, .kbuilder .main-image.house-1 svg polygon.walls-color.cantera {
+  fill: #B6B6B6;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.walls-color.concrete, .kbuilder .main-image.house-1 svg polygon.walls-color.concrete {
+  fill: #878883;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.walls-color.teal, .kbuilder .main-image.house-1 svg polygon.walls-color.teal {
+  fill: #00a99d;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.roof-color, .kbuilder .main-image.house-1 svg polygon.roof-color {
+  fill: #e91e2f;
+  mix-blend-mode: multiply;
+}
+.kbuilder .main-image.house-1 svg path.roof-color.white, .kbuilder .main-image.house-1 svg polygon.roof-color.white {
+  fill: #F9FDFE;
+  mix-blend-mode: screen;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.roof-color.red, .kbuilder .main-image.house-1 svg polygon.roof-color.red {
+  fill: #e91e2f;
+  mix-blend-mode: multiply;
+  opacity: 0.8;
+}
+.kbuilder .main-image.house-1 svg path.roof-color.pink, .kbuilder .main-image.house-1 svg polygon.roof-color.pink {
+  fill: #E4007C;
+  mix-blend-mode: multiply;
+  opacity: 0.8;
+}
+.kbuilder .main-image.house-1 svg path.roof-color.cobalt, .kbuilder .main-image.house-1 svg polygon.roof-color.cobalt {
+  fill: #0047AB;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.roof-color.mustard, .kbuilder .main-image.house-1 svg polygon.roof-color.mustard {
+  fill: #EAC102;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.roof-color.terracota, .kbuilder .main-image.house-1 svg polygon.roof-color.terracota {
+  fill: #AD7D60;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.roof-color.tezontle, .kbuilder .main-image.house-1 svg polygon.roof-color.tezontle {
+  fill: #A55749;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.roof-color.cantera, .kbuilder .main-image.house-1 svg polygon.roof-color.cantera {
+  fill: #B6B6B6;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.roof-color.concrete, .kbuilder .main-image.house-1 svg polygon.roof-color.concrete {
+  fill: #878883;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.roof-color.teal, .kbuilder .main-image.house-1 svg polygon.roof-color.teal {
+  fill: #00a99d;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+.kbuilder .main-image.house-1 svg path.windows-color, .kbuilder .main-image.house-1 svg polygon.windows-color {
+  fill: none;
+  mix-blend-mode: normal;
+}
+.kbuilder .main-image.house-1 svg path.windows-color.mahogany, .kbuilder .main-image.house-1 svg polygon.windows-color.mahogany {
+  fill: #321616;
+  opacity: 0.8;
+  mix-blend-mode: darken;
+}
+.kbuilder .main-image.house-1 svg path.windows-color.golden-oak, .kbuilder .main-image.house-1 svg polygon.windows-color.golden-oak {
+  fill: #8f5d19;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+.kbuilder .main-image.house-1 svg path.windows-color.bronze, .kbuilder .main-image.house-1 svg polygon.windows-color.bronze {
+  fill: #2e2f2a;
+  opacity: 0.8;
+  mix-blend-mode: multiply;
+}
+.kbuilder .main-image.house-1 svg path.windows-color.nogal, .kbuilder .main-image.house-1 svg polygon.windows-color.nogal {
+  fill: #5c4026;
+  opacity: 0.8;
+  mix-blend-mode: multiply;
+}
+.kbuilder .main-image.house-1 svg path.windows-color.black, .kbuilder .main-image.house-1 svg polygon.windows-color.black {
+  fill: #0D0D0D;
+  opacity: 0.8;
+}
+.kbuilder .main-image.house-1 svg path.windows-color.brown, .kbuilder .main-image.house-1 svg polygon.windows-color.brown {
+  fill: #1c1209;
+  opacity: 0.8;
+  mix-blend-mode: multiply;
+}
+.kbuilder .main-image.house-1 svg path.windows-color.shiefeld, .kbuilder .main-image.house-1 svg polygon.windows-color.shiefeld {
+  fill: #999280;
+  opacity: 0.8;
+  mix-blend-mode: multiply;
+}
+.kbuilder .main-image.house-1 svg path.windows-color.silver, .kbuilder .main-image.house-1 svg polygon.windows-color.silver {
+  fill: #b3b3b3;
+  opacity: 1;
+  mix-blend-mode: hue;
+}
+.kbuilder .main-image.house-1 svg path.windows-color.beige, .kbuilder .main-image.house-1 svg polygon.windows-color.beige {
+  fill: #d8cfbd;
+  mix-blend-mode: normal;
+  opacity: 0.5;
+}
+.kbuilder .main-image.house-1 svg path.windows-color.white, .kbuilder .main-image.house-1 svg polygon.windows-color.white {
+  fill: #F9FDFE;
+  mix-blend-mode: normal;
+  opacity: 0.6;
+}
+.kbuilder .main-image.house-1 svg.house-1 .ceiling {
+  fill: #e91e2f;
+}/*# sourceMappingURL=style.css.map */
