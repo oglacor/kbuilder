@@ -1,460 +1,486 @@
-* {
-  box-sizing: border-box;
-  outline: none;
-}
-
-button {
-  cursor: pointer;
-  border: none;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: "AsenPro", sans-serif;
-  font-weight: 400;
-}
-
-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 190px;
-  height: 80px;
-  background-color: #fff;
-  z-index: 50000;
-}
-header .logo {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-header .logo a {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-header .logo img {
-  max-width: 80%;
-  max-height: 80%;
+.kbuilder-notice {
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  background-color: #fff3cd;
+  color: #664d03;
+  font-size: 13px;
 }
 
 .kbuilder {
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  font-family: "AsenPro", sans-serif;
+  font-weight: 400;
+  color: #0D0D0D;
+  background-color: #fff;
 }
-.kbuilder .action-buttons {
-  aspect-ratio: 16/9;
-  width: 100%;
-  max-height: 100vh;
-  z-index: 2;
-  position: fixed;
-  top: 0;
-  left: 0;
+.kbuilder *, .kbuilder *::before, .kbuilder *::after {
+  box-sizing: border-box;
 }
-.kbuilder .action-buttons button.action-button {
-  position: absolute;
-  background-color: transparent;
-  width: 100px;
-  height: 100px;
+.kbuilder button, .kbuilder button:hover, .kbuilder button:focus {
+  appearance: none;
+  margin: 0;
+  padding: 0;
   border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: none;
+  min-width: 0;
+  min-height: 0;
+  cursor: pointer;
 }
-.kbuilder .action-buttons button.action-button.roof {
-  left: 45%;
-  top: 7%;
+.kbuilder button:focus-visible {
+  outline: solid 2px #e91e2f;
+  outline-offset: 2px;
 }
-.kbuilder .action-buttons button.action-button.walls {
-  left: 39%;
-  top: 56%;
-}
-.kbuilder .action-buttons button.action-button.window {
-  left: 65%;
-  top: 33%;
-}
-.kbuilder .color-selector-container {
-  z-index: 3;
-  position: fixed;
+.kbuilder .kbuilder-logo {
+  position: absolute;
   top: 0;
+  left: 0;
+  z-index: 4;
+  width: 190px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+}
+.kbuilder .kbuilder-logo img {
+  display: block;
+  max-width: 80%;
+  max-height: 80%;
+}
+.kbuilder .kbuilder-house {
+  position: relative;
+  display: none;
+}
+.kbuilder .kbuilder-house.active {
+  display: block;
+}
+.kbuilder .kbuilder-stage {
+  position: relative;
+  width: 100%;
+}
+.kbuilder .kbuilder-stage svg.kbuilder-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+.kbuilder .kbuilder-stage .kbuilder-region path {
+  fill: none;
+  opacity: 0;
+  transition: all 1s ease-out;
+}
+.kbuilder .kbuilder-hotspots {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.kbuilder button.kbuilder-hotspot {
+  position: absolute;
+  width: clamp(44px, 5.2%, 100px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s ease-out;
+  pointer-events: auto;
+}
+.kbuilder button.kbuilder-hotspot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+.kbuilder button.kbuilder-hotspot:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+.kbuilder .kbuilder-panel {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  bottom: 0;
   right: -240px;
   width: 240px;
-  height: 100%;
-  transition: all 0.3s ease-out;
+  transition: right 0.3s ease-out;
 }
-.kbuilder .color-selector-container.active {
+.kbuilder .kbuilder-panel.active {
   right: 0;
 }
-.kbuilder .color-selector-container .color-selector-nav {
+.kbuilder .kbuilder-panel-nav {
   position: absolute;
-  top: 200px;
+  top: 50%;
   left: -66px;
   width: 70px;
   z-index: 10;
+  transform: translateY(-50%);
 }
-.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button {
+.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button {
+  position: relative;
   left: -30px;
+  display: block;
   width: 100px;
   height: 93px;
+  margin: 10px 0;
   transform: scale(0.7);
   transform-origin: right center;
-  background-color: transparent;
-  margin: 10px 0;
-  padding: 0;
-  display: block;
-  position: relative;
   box-shadow: -5px 0 10px 5px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease-out;
 }
-.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button svg rect.bg {
+.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button svg rect.bg {
   transition: all 0.3s ease-out;
   fill: #999;
   stroke: gray;
   stroke-width: 2px;
 }
-.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button svg path.icon {
+.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button svg path.icon {
   transition: all 0.3s ease-out;
   fill: #fff;
   opacity: 0.5;
 }
-.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button.active {
+.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button.active {
   transform: scale(1);
   box-shadow: -5px 0 5px -5px rgba(0, 0, 0, 0.5);
 }
-.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button.active svg rect.bg {
+.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button.active svg rect.bg {
   fill: #e91e2f;
   stroke: #e91e2f;
-  stroke-width: 2px;
 }
-.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button.active svg path.icon {
-  fill: #fff;
+.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button.active svg path.icon {
   opacity: 1;
 }
-.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button:hover svg rect.bg {
+.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button:hover svg rect.bg {
   fill: #a31e2f;
   stroke: #e91e2f;
-  stroke-width: 2px;
 }
-.kbuilder .color-selector-container .color-selector-nav button.color-selector-nav-button:hover svg path.icon {
-  fill: #fff;
+.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button:hover svg path.icon {
   opacity: 1;
 }
-.kbuilder .color-selector-container .color-selector {
-  position: relative;
+.kbuilder button.kbuilder-panel-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  background-color: #e91e2f;
+  border: solid 2px white;
+  z-index: 15;
+}
+.kbuilder button.kbuilder-panel-close svg {
+  display: block;
   width: 100%;
   height: 100%;
-  background-color: #fff;
-  padding: 20px;
-  border-left: solid 2px #e91e2f;
-  z-index: 12;
-  box-shadow: -5px 0 10px 5px rgba(0, 0, 0, 0.3);
-  display: none;
 }
-.kbuilder .color-selector-container .color-selector.active {
+.kbuilder button.kbuilder-panel-close svg line {
+  stroke: #F9FDFE;
+  stroke-width: 4px;
+}
+.kbuilder button.kbuilder-panel-close:hover {
+  background-color: #a31e2f;
+}
+.kbuilder .kbuilder-selector {
+  position: relative;
+  z-index: 12;
+  display: none;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px;
+  background-color: #fff;
+  border-left: solid 2px #e91e2f;
+  box-shadow: -5px 0 10px 5px rgba(0, 0, 0, 0.3);
+}
+.kbuilder .kbuilder-selector.active {
   display: block;
 }
-.kbuilder .color-selector-container .color-selector h2.color-selector-title {
+.kbuilder h2.kbuilder-selector-title {
+  margin: 0;
+  padding: 0;
   color: #e91e2f;
+  font-family: inherit;
   font-size: 32px;
   font-weight: 500;
+  line-height: 1.2;
+  text-transform: none;
+  letter-spacing: normal;
 }
-.kbuilder .color-selector-container .color-selector .color-selector-grid {
+.kbuilder .kbuilder-swatches {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   margin-top: 20px;
   align-items: flex-start;
 }
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb {
-  width: 100%;
-  border-radius: 5px;
-  cursor: pointer;
+.kbuilder button.kbuilder-swatch {
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
   flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  text-align: left;
 }
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element {
+.kbuilder button.kbuilder-swatch .kbuilder-swatch-chip {
   display: block;
-  border: solid 2px #999;
-  background-color: #F9FDFE;
   width: 80px;
   height: 80px;
+  border: solid 2px #999;
+  background-color: #F9FDFE;
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
 }
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.white {
-  background-color: #F9FDFE;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.red {
-  background-color: #e91e2f;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.pink {
-  background-color: #E4007C;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.cobalt {
-  background-color: #0047AB;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.mustard {
-  background-color: #EAC102;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.terracota {
-  background-color: #AD7D60;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.tezontle {
-  background-color: #A55749;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.cantera {
-  background-color: #B6B6B6;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.concrete {
-  background-color: #878883;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.teal {
-  background-color: #00a99d;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.mahogany {
-  background-image: url(../images/mahogany.jpg);
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.golden-oak {
-  background-image: url(../images/oak.jpg);
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.bronze {
-  background-image: url(../images/bronze.jpg);
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.nogal {
-  background-image: url(../images/nogal.jpg);
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.black {
-  background-color: #0D0D0D;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.brown {
-  background-color: #1c1209;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.shiefeld {
-  background-image: url(../images/shiefeld.jpg);
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.silver {
-  background-color: #b3b3b3;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb button.color-element.beige {
-  background-color: #d8cfbd;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb h4.color-name {
-  color: #999;
-  margin: 5px 0 0 0;
-  font-size: 14px;
-  text-align: left;
-  width: 100%;
-  font-weight: 500;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb.selected button.color-element {
+.kbuilder button.kbuilder-swatch .kbuilder-swatch-name {
   display: block;
-  border: solid 4px #999;
-  background-color: #F9FDFE;
-  width: 80px;
-  height: 80px;
+  width: 100%;
+  margin: 5px 0 0 0;
+  color: #999;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
 }
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb.selected h4.color-name {
-  font-weight: 900;
-  color: #0D0D0D;
-}
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb:hover button.color-element {
+.kbuilder button.kbuilder-swatch:hover .kbuilder-swatch-chip {
   border: solid 4px #0D0D0D;
 }
-.kbuilder .color-selector-container .color-selector .color-selector-grid .color-thumb:hover h4.color-name {
+.kbuilder button.kbuilder-swatch:hover .kbuilder-swatch-name {
   color: #0D0D0D;
 }
-.kbuilder .color-selector-container button.color-select-close {
+.kbuilder button.kbuilder-swatch.selected .kbuilder-swatch-chip {
+  border: solid 4px #e91e2f;
+}
+.kbuilder button.kbuilder-swatch.selected .kbuilder-swatch-name {
+  color: #0D0D0D;
+  font-weight: 900;
+}
+.kbuilder .kbuilder-toolbar {
+  position: absolute;
+  z-index: 4;
+  left: 20px;
+  bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.kbuilder .kbuilder-house-switch {
+  display: flex;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+.kbuilder button.kbuilder-house-button {
+  padding: 14px 18px;
+  background-color: #fff;
+  color: #999;
+  font-size: 15px;
+  font-weight: 500;
+}
+.kbuilder button.kbuilder-house-button:hover {
+  background-color: #fff;
+  color: #0D0D0D;
+}
+.kbuilder button.kbuilder-house-button.active {
+  background-color: #0D0D0D;
+  color: #fff;
+}
+.kbuilder button.kbuilder-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 22px;
+  background-color: #e91e2f;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+.kbuilder button.kbuilder-download svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.kbuilder button.kbuilder-download:hover {
+  background-color: #a31e2f;
+  color: #fff;
+}
+.kbuilder button.kbuilder-download.is-busy {
+  opacity: 0.75;
+  cursor: progress;
+}
+
+.kbuilder-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  font-family: "AsenPro", sans-serif;
+}
+.kbuilder-modal[hidden] {
+  display: none;
+}
+.kbuilder-modal .kbuilder-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(13, 13, 13, 0.6);
+}
+.kbuilder-modal .kbuilder-modal-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 36px 32px 28px;
+  background-color: #fff;
+  border-top: solid 4px #e91e2f;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+.kbuilder-modal button.kbuilder-modal-close {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: none;
+  min-width: 0;
+  min-height: 0;
+  cursor: pointer;
   position: absolute;
   top: 0;
   right: 0;
   width: 40px;
   height: 40px;
-  border: none;
   background-color: #e91e2f;
-  color: white;
-  font-size: 20px;
   border: solid 2px white;
   z-index: 15;
 }
-.kbuilder .color-selector-container button.color-select-close svg line {
+.kbuilder-modal button.kbuilder-modal-close svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.kbuilder-modal button.kbuilder-modal-close svg line {
   stroke: #F9FDFE;
   stroke-width: 4px;
 }
-.kbuilder .main-image {
-  aspect-ratio: 16/9;
-  max-height: 100vh;
+.kbuilder-modal button.kbuilder-modal-close:hover {
+  background-color: #a31e2f;
 }
-.kbuilder .main-image.house-1 svg path, .kbuilder .main-image.house-1 svg polygon {
-  transition: all 1s ease-out;
+.kbuilder-modal h2.kbuilder-modal-title {
+  margin: 0 0 8px;
+  color: #e91e2f;
+  font-family: inherit;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.2;
 }
-.kbuilder .main-image.house-1 svg path.walls-color, .kbuilder .main-image.house-1 svg polygon.walls-color {
-  fill: #e91e2f;
-  mix-blend-mode: multiply;
+.kbuilder-modal .kbuilder-modal-intro {
+  margin: 0 0 20px;
+  color: #555;
+  font-size: 15px;
+  line-height: 1.5;
 }
-.kbuilder .main-image.house-1 svg path.walls-color.white, .kbuilder .main-image.house-1 svg polygon.walls-color.white {
-  fill: #F9FDFE;
-  mix-blend-mode: color;
-  opacity: 1;
+
+body.kbuilder-modal-open {
+  overflow: hidden;
 }
-.kbuilder .main-image.house-1 svg path.walls-color.red, .kbuilder .main-image.house-1 svg polygon.walls-color.red {
-  fill: #e91e2f;
-  mix-blend-mode: multiply;
-  opacity: 0.8;
+
+@media (max-width: 767px) {
+  .kbuilder .kbuilder-logo {
+    width: 110px;
+    height: 46px;
+  }
+  .kbuilder .kbuilder-panel {
+    position: relative;
+    right: auto;
+    width: auto;
+    transition: none;
+  }
+  .kbuilder .kbuilder-panel-nav {
+    position: static;
+    display: flex;
+    gap: 6px;
+    width: auto;
+    padding: 10px 16px;
+    transform: none;
+  }
+  .kbuilder .kbuilder-panel-nav button.kbuilder-nav-button {
+    left: 0;
+    width: 56px;
+    height: 52px;
+    margin: 0;
+    transform: none;
+    box-shadow: none;
+  }
+  .kbuilder .kbuilder-panel-nav button.kbuilder-nav-button.active {
+    transform: none;
+    box-shadow: none;
+  }
+  .kbuilder button.kbuilder-panel-close {
+    display: none;
+    top: 10px;
+    right: 16px;
+  }
+  .kbuilder .kbuilder-panel.active button.kbuilder-panel-close {
+    display: block;
+  }
+  .kbuilder .kbuilder-selector {
+    height: auto;
+    padding: 16px;
+    border-left: none;
+    border-top: solid 2px #e91e2f;
+    box-shadow: none;
+  }
+  .kbuilder .kbuilder-panel:not(.active) .kbuilder-selector {
+    display: none;
+  }
+  .kbuilder h2.kbuilder-selector-title {
+    font-size: 24px;
+  }
+  .kbuilder .kbuilder-swatches {
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  }
+  .kbuilder button.kbuilder-swatch .kbuilder-swatch-chip {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+  .kbuilder .kbuilder-toolbar {
+    position: static;
+    padding: 0 16px 16px;
+  }
+  .kbuilder .kbuilder-house-switch {
+    width: 100%;
+    box-shadow: none;
+    border: solid 1px #ddd;
+  }
+  .kbuilder .kbuilder-house-switch button.kbuilder-house-button {
+    flex: 1;
+  }
+  .kbuilder button.kbuilder-download {
+    width: 100%;
+    justify-content: center;
+  }
 }
-.kbuilder .main-image.house-1 svg path.walls-color.pink, .kbuilder .main-image.house-1 svg polygon.walls-color.pink {
-  fill: #E4007C;
-  mix-blend-mode: multiply;
-  opacity: 0.8;
-}
-.kbuilder .main-image.house-1 svg path.walls-color.cobalt, .kbuilder .main-image.house-1 svg polygon.walls-color.cobalt {
-  fill: #0047AB;
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.walls-color.mustard, .kbuilder .main-image.house-1 svg polygon.walls-color.mustard {
-  fill: #EAC102;
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.walls-color.terracota, .kbuilder .main-image.house-1 svg polygon.walls-color.terracota {
-  fill: #AD7D60;
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.walls-color.tezontle, .kbuilder .main-image.house-1 svg polygon.walls-color.tezontle {
-  fill: #A55749;
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.walls-color.cantera, .kbuilder .main-image.house-1 svg polygon.walls-color.cantera {
-  fill: #B6B6B6;
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.walls-color.concrete, .kbuilder .main-image.house-1 svg polygon.walls-color.concrete {
-  fill: #878883;
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.walls-color.teal, .kbuilder .main-image.house-1 svg polygon.walls-color.teal {
-  fill: #00a99d;
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.roof-color, .kbuilder .main-image.house-1 svg polygon.roof-color {
-  fill: #e91e2f;
-  mix-blend-mode: multiply;
-}
-.kbuilder .main-image.house-1 svg path.roof-color.white, .kbuilder .main-image.house-1 svg polygon.roof-color.white {
-  fill: #F9FDFE;
-  mix-blend-mode: screen;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.roof-color.red, .kbuilder .main-image.house-1 svg polygon.roof-color.red {
-  fill: #e91e2f;
-  mix-blend-mode: multiply;
-  opacity: 0.8;
-}
-.kbuilder .main-image.house-1 svg path.roof-color.pink, .kbuilder .main-image.house-1 svg polygon.roof-color.pink {
-  fill: #E4007C;
-  mix-blend-mode: multiply;
-  opacity: 0.8;
-}
-.kbuilder .main-image.house-1 svg path.roof-color.cobalt, .kbuilder .main-image.house-1 svg polygon.roof-color.cobalt {
-  fill: #0047AB;
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.roof-color.mustard, .kbuilder .main-image.house-1 svg polygon.roof-color.mustard {
-  fill: #EAC102;
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.roof-color.terracota, .kbuilder .main-image.house-1 svg polygon.roof-color.terracota {
-  fill: #AD7D60;
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.roof-color.tezontle, .kbuilder .main-image.house-1 svg polygon.roof-color.tezontle {
-  fill: #A55749;
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.roof-color.cantera, .kbuilder .main-image.house-1 svg polygon.roof-color.cantera {
-  fill: #B6B6B6;
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.roof-color.concrete, .kbuilder .main-image.house-1 svg polygon.roof-color.concrete {
-  fill: #878883;
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.roof-color.teal, .kbuilder .main-image.house-1 svg polygon.roof-color.teal {
-  fill: #00a99d;
-  mix-blend-mode: multiply;
-  opacity: 1;
-}
-.kbuilder .main-image.house-1 svg path.windows-color, .kbuilder .main-image.house-1 svg polygon.windows-color {
-  fill: none;
-  mix-blend-mode: normal;
-}
-.kbuilder .main-image.house-1 svg path.windows-color.mahogany, .kbuilder .main-image.house-1 svg polygon.windows-color.mahogany {
-  fill: #321616;
-  opacity: 0.8;
-  mix-blend-mode: darken;
-}
-.kbuilder .main-image.house-1 svg path.windows-color.golden-oak, .kbuilder .main-image.house-1 svg polygon.windows-color.golden-oak {
-  fill: #8f5d19;
-  opacity: 0.5;
-  mix-blend-mode: multiply;
-}
-.kbuilder .main-image.house-1 svg path.windows-color.bronze, .kbuilder .main-image.house-1 svg polygon.windows-color.bronze {
-  fill: #2e2f2a;
-  opacity: 0.8;
-  mix-blend-mode: multiply;
-}
-.kbuilder .main-image.house-1 svg path.windows-color.nogal, .kbuilder .main-image.house-1 svg polygon.windows-color.nogal {
-  fill: #5c4026;
-  opacity: 0.8;
-  mix-blend-mode: multiply;
-}
-.kbuilder .main-image.house-1 svg path.windows-color.black, .kbuilder .main-image.house-1 svg polygon.windows-color.black {
-  fill: #0D0D0D;
-  opacity: 0.8;
-}
-.kbuilder .main-image.house-1 svg path.windows-color.brown, .kbuilder .main-image.house-1 svg polygon.windows-color.brown {
-  fill: #1c1209;
-  opacity: 0.8;
-  mix-blend-mode: multiply;
-}
-.kbuilder .main-image.house-1 svg path.windows-color.shiefeld, .kbuilder .main-image.house-1 svg polygon.windows-color.shiefeld {
-  fill: #999280;
-  opacity: 0.8;
-  mix-blend-mode: multiply;
-}
-.kbuilder .main-image.house-1 svg path.windows-color.silver, .kbuilder .main-image.house-1 svg polygon.windows-color.silver {
-  fill: #b3b3b3;
-  opacity: 1;
-  mix-blend-mode: hue;
-}
-.kbuilder .main-image.house-1 svg path.windows-color.beige, .kbuilder .main-image.house-1 svg polygon.windows-color.beige {
-  fill: #d8cfbd;
-  mix-blend-mode: normal;
-  opacity: 0.5;
-}
-.kbuilder .main-image.house-1 svg path.windows-color.white, .kbuilder .main-image.house-1 svg polygon.windows-color.white {
-  fill: #F9FDFE;
-  mix-blend-mode: normal;
-  opacity: 0.6;
-}
-.kbuilder .main-image.house-1 svg.house-1 .ceiling {
-  fill: #e91e2f;
-}/*# sourceMappingURL=style.css.map */
+
+/*# sourceMappingURL=style.css.map */

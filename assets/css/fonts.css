@@ -20,6 +20,14 @@
     font-style: normal;
 }
 
+/* --- MEDIUM --- */
+@font-face {
+    font-family: 'AsenPro';
+    src: url('../fonts/AsenPro-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+}
+
 /* --- BOLD --- */
 @font-face {
     font-family: 'AsenPro';
