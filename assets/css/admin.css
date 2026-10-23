@@ -1,0 +1,237 @@
+/* K-Builder admin: house and finish screens, lists, guide. */
+
+/* House preview ------------------------------------------------------------ */
+
+.kbuilder-preview {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #1d2327;
+    touch-action: none;
+    user-select: none;
+}
+.kbuilder-preview-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.kbuilder-preview.is-empty .kbuilder-media-image {
+    display: none;
+}
+.kbuilder-preview-zone {
+    fill: var(--zone);
+    fill-opacity: 0.35;
+    stroke: var(--zone);
+    transition: fill-opacity 0.15s;
+}
+.kbuilder-preview-zone path {
+    stroke-width: 1.5px;
+    vector-effect: non-scaling-stroke;
+}
+.kbuilder-preview-zone.is-hover {
+    fill-opacity: 0.7;
+}
+.kbuilder-preview-empty {
+    position: absolute;
+    inset: 0;
+    display: none;
+    place-items: center;
+    margin: 0;
+    color: #a7aaad;
+    font-size: 14px;
+}
+.kbuilder-preview.is-empty .kbuilder-preview-empty {
+    display: grid;
+}
+
+.kbuilder-marker {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: var(--zone);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.45);
+    transform: translate(-50%, -50%);
+    cursor: grab;
+    touch-action: none;
+}
+.kbuilder-marker:focus {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+.kbuilder-marker.is-dragging {
+    cursor: grabbing;
+}
+.kbuilder-marker span {
+    position: absolute;
+    left: calc(100% + 6px);
+    top: 50%;
+    padding: 2px 6px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: nowrap;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.kbuilder-image-warning[hidden] {
+    display: none;
+}
+p.kbuilder-image-warning {
+    margin: 10px 0 0;
+    padding: 6px 12px;
+}
+.kbuilder-preview-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 12px 0;
+}
+.kbuilder-preview-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 26px;
+    margin: 6px 0 8px;
+}
+.kbuilder-preview-legend li {
+    margin: 0;
+}
+.kbuilder-marker-state {
+    margin: 0 6px;
+    color: #646970;
+}
+.kbuilder-marker-state::before {
+    content: '· ';
+}
+.kbuilder-zone-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: var(--zone);
+    vertical-align: -1px;
+}
+
+/* Zones table, specs ------------------------------------------------------- */
+
+.kbuilder-zones td {
+    vertical-align: middle;
+}
+.kbuilder-zones th:first-child {
+    width: 120px;
+}
+.kbuilder-zone-remove {
+    margin-left: 12px;
+    white-space: nowrap;
+}
+.kbuilder-specs {
+    margin: 0;
+}
+.kbuilder-specs li {
+    margin-bottom: 10px;
+}
+
+/* Finishes ----------------------------------------------------------------- */
+
+.kbuilder-texture-chip {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    margin-right: 10px;
+    border: 1px solid #c3c4c7;
+    background: #f6f7f7 center / cover no-repeat;
+    vertical-align: middle;
+}
+.kbuilder-finish-zones label {
+    display: inline-block;
+    margin-right: 18px;
+}
+.kbuilder-finish-form input[type="range"] {
+    width: 260px;
+    vertical-align: middle;
+}
+.kbuilder-opacity-value {
+    display: inline-block;
+    min-width: 42px;
+    margin-left: 8px;
+    font-weight: 600;
+}
+.kbuilder-finish-preview {
+    max-width: 640px;
+    aspect-ratio: 16 / 9;
+    background: #1d2327;
+}
+.kbuilder-finish-preview svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.kbuilder-finish-preview-zone {
+    opacity: 0;
+    transition: opacity 0.2s, fill 0.2s;
+}
+
+/* Lists -------------------------------------------------------------------- */
+
+.column-kbuilder_image {
+    width: 120px;
+}
+.kbuilder-list-thumb {
+    display: block;
+    width: 100px;
+    height: auto;
+}
+.column-kbuilder_swatch {
+    width: 64px;
+}
+.column-kbuilder_swatch .kbuilder-texture-chip {
+    width: 36px;
+    height: 36px;
+    margin: 0;
+}
+.column-menu_order {
+    width: 60px;
+}
+
+/* Guide -------------------------------------------------------------------- */
+
+.kbuilder-guide {
+    max-width: 880px;
+}
+.kbuilder-guide h2 {
+    margin-top: 2.2em;
+    padding-top: 1.2em;
+    border-top: 1px solid #dcdcde;
+}
+.kbuilder-guide h2:first-of-type {
+    border-top: 0;
+}
+.kbuilder-guide p,
+.kbuilder-guide li {
+    font-size: 14px;
+    line-height: 1.6;
+}
+.kbuilder-guide ol,
+.kbuilder-guide ul {
+    margin-left: 1.6em;
+}
+.kbuilder-guide ul {
+    list-style: disc;
+}
+.kbuilder-guide .widefat td,
+.kbuilder-guide .widefat th {
+    font-size: 13px;
+}
+.kbuilder-guide-callout {
+    padding: 12px 16px;
+    border-left: 4px solid #e91e2f;
+    background: #fff;
+}

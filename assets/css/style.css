@@ -1,21 +1,88 @@
-.kbuilder-notice {
+@keyframes kb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes kb-pulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+@keyframes kb-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+@keyframes kb-scan {
+  from {
+    top: -140px;
+  }
+  to {
+    top: 100%;
+  }
+}
+@keyframes kb-march {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+@keyframes kb-stripes {
+  to {
+    background-position: 40px 0;
+  }
+}
+.kbuilder-sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+p.kbuilder-notice {
   margin: 0 0 10px;
   padding: 8px 12px;
   background-color: #fff3cd;
   color: #664d03;
   font-size: 13px;
+  line-height: 1.4;
+}
+
+body.kbuilder-page {
+  margin: 0;
+  background-color: #06080b;
 }
 
 .kbuilder {
+  --kb-red: #e91e2f;
+  --kb-top: var(--wp-admin--admin-bar--height, 0px);
+  container: kbuilder/inline-size;
   position: relative;
-  overflow: hidden;
+  color: #e9edf1;
   font-family: "AsenPro", sans-serif;
   font-weight: 400;
-  color: #0D0D0D;
-  background-color: #fff;
+  text-align: left;
+  background: radial-gradient(ellipse 60% 50% at 25% 15%, rgba(233, 30, 47, 0.13), transparent 70%), radial-gradient(ellipse 50% 60% at 85% 100%, rgba(70, 110, 150, 0.12), transparent 70%), #06080b;
 }
 .kbuilder *, .kbuilder *::before, .kbuilder *::after {
   box-sizing: border-box;
+}
+.kbuilder h2, .kbuilder p {
+  margin: 0;
+  padding: 0;
+}
+.kbuilder a {
+  color: inherit;
+  text-decoration: none;
 }
 .kbuilder button, .kbuilder button:hover, .kbuilder button:focus {
   appearance: none;
@@ -35,291 +102,753 @@
   min-height: 0;
   cursor: pointer;
 }
-.kbuilder button:focus-visible {
-  outline: solid 2px #e91e2f;
+.kbuilder button:focus-visible, .kbuilder a:focus-visible {
+  outline: solid 2px var(--kb-red);
   outline-offset: 2px;
 }
-.kbuilder .kbuilder-logo {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 4;
-  width: 190px;
-  height: 80px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #fff;
+.kbuilder svg {
+  overflow: hidden;
 }
-.kbuilder .kbuilder-logo img {
-  display: block;
-  max-width: 80%;
-  max-height: 80%;
-}
-.kbuilder .kbuilder-house {
+
+.kbuilder-app {
   position: relative;
-  display: none;
-}
-.kbuilder .kbuilder-house.active {
-  display: block;
-}
-.kbuilder .kbuilder-stage {
-  position: relative;
-  width: 100%;
-}
-.kbuilder .kbuilder-stage svg.kbuilder-canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-}
-.kbuilder .kbuilder-stage .kbuilder-region path {
-  fill: none;
-  opacity: 0;
-  transition: all 1s ease-out;
-}
-.kbuilder .kbuilder-hotspots {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-.kbuilder button.kbuilder-hotspot {
-  position: absolute;
-  width: clamp(44px, 5.2%, 100px);
-  aspect-ratio: 1;
-  transform: translate(-50%, -50%);
-  transition: transform 0.2s ease-out;
-  pointer-events: auto;
-}
-.kbuilder button.kbuilder-hotspot img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-}
-.kbuilder button.kbuilder-hotspot:hover {
-  transform: translate(-50%, -50%) scale(1.1);
-}
-.kbuilder .kbuilder-panel {
-  position: absolute;
-  z-index: 5;
-  top: 0;
-  bottom: 0;
-  right: -240px;
-  width: 240px;
-  transition: right 0.3s ease-out;
-}
-.kbuilder .kbuilder-panel.active {
-  right: 0;
-}
-.kbuilder .kbuilder-panel-nav {
-  position: absolute;
-  top: 50%;
-  left: -66px;
-  width: 70px;
-  z-index: 10;
-  transform: translateY(-50%);
-}
-.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button {
-  position: relative;
-  left: -30px;
-  display: block;
-  width: 100px;
-  height: 93px;
-  margin: 10px 0;
-  transform: scale(0.7);
-  transform-origin: right center;
-  box-shadow: -5px 0 10px 5px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease-out;
-}
-.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button svg rect.bg {
-  transition: all 0.3s ease-out;
-  fill: #999;
-  stroke: gray;
-  stroke-width: 2px;
-}
-.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button svg path.icon {
-  transition: all 0.3s ease-out;
-  fill: #fff;
-  opacity: 0.5;
-}
-.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button.active {
-  transform: scale(1);
-  box-shadow: -5px 0 5px -5px rgba(0, 0, 0, 0.5);
-}
-.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button.active svg rect.bg {
-  fill: #e91e2f;
-  stroke: #e91e2f;
-}
-.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button.active svg path.icon {
-  opacity: 1;
-}
-.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button:hover svg rect.bg {
-  fill: #a31e2f;
-  stroke: #e91e2f;
-}
-.kbuilder .kbuilder-panel-nav button.kbuilder-nav-button:hover svg path.icon {
-  opacity: 1;
-}
-.kbuilder button.kbuilder-panel-close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 40px;
-  height: 40px;
-  background-color: #e91e2f;
-  border: solid 2px white;
-  z-index: 15;
-}
-.kbuilder button.kbuilder-panel-close svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-.kbuilder button.kbuilder-panel-close svg line {
-  stroke: #F9FDFE;
-  stroke-width: 4px;
-}
-.kbuilder button.kbuilder-panel-close:hover {
-  background-color: #a31e2f;
-}
-.kbuilder .kbuilder-selector {
-  position: relative;
-  z-index: 12;
-  display: none;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  padding: 20px;
-  background-color: #fff;
-  border-left: solid 2px #e91e2f;
-  box-shadow: -5px 0 10px 5px rgba(0, 0, 0, 0.3);
-}
-.kbuilder .kbuilder-selector.active {
-  display: block;
-}
-.kbuilder h2.kbuilder-selector-title {
-  margin: 0;
-  padding: 0;
-  color: #e91e2f;
-  font-family: inherit;
-  font-size: 32px;
-  font-weight: 500;
-  line-height: 1.2;
-  text-transform: none;
-  letter-spacing: normal;
-}
-.kbuilder .kbuilder-swatches {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-top: 20px;
-  align-items: flex-start;
-}
-.kbuilder button.kbuilder-swatch {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
-  text-align: left;
+  height: clamp(560px, 82vh, 900px);
 }
-.kbuilder button.kbuilder-swatch .kbuilder-swatch-chip {
-  display: block;
-  width: 80px;
-  height: 80px;
-  border: solid 2px #999;
-  background-color: #F9FDFE;
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-}
-.kbuilder button.kbuilder-swatch .kbuilder-swatch-name {
-  display: block;
-  width: 100%;
-  margin: 5px 0 0 0;
-  color: #999;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.2;
-}
-.kbuilder button.kbuilder-swatch:hover .kbuilder-swatch-chip {
-  border: solid 4px #0D0D0D;
-}
-.kbuilder button.kbuilder-swatch:hover .kbuilder-swatch-name {
-  color: #0D0D0D;
-}
-.kbuilder button.kbuilder-swatch.selected .kbuilder-swatch-chip {
-  border: solid 4px #e91e2f;
-}
-.kbuilder button.kbuilder-swatch.selected .kbuilder-swatch-name {
-  color: #0D0D0D;
-  font-weight: 900;
-}
-.kbuilder .kbuilder-toolbar {
+.kbuilder-app::before {
+  content: "";
   position: absolute;
-  z-index: 4;
-  left: 20px;
-  bottom: 20px;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse at center, #000 30%, transparent 80%);
+}
+
+.kbuilder--fullscreen .kbuilder-app {
+  height: calc(100vh - var(--kb-top));
+  height: calc(100dvh - var(--kb-top));
+}
+
+.kbuilder-topbar {
+  position: relative;
+  z-index: 3;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 28px;
+  min-height: 64px;
+  padding: 0 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(to bottom, rgba(10, 13, 17, 0.95), rgba(10, 13, 17, 0.6));
+}
+.kbuilder-topbar::after {
+  content: "";
+  position: absolute;
+  left: 24px;
+  bottom: -1px;
+  width: 160px;
+  height: 2px;
+  background: var(--kb-red);
+  box-shadow: 0 0 12px var(--kb-red);
+}
+
+.kbuilder-brand {
+  flex: none;
+  display: block;
+}
+.kbuilder-brand img {
+  display: block;
+  width: auto;
+  height: 30px;
+  max-width: none;
+}
+
+p.kbuilder-status {
+  font-family: "Cascadia Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  display: flex;
   align-items: center;
   gap: 10px;
+  color: #8a95a2;
+  padding-left: 28px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 28px;
 }
-.kbuilder .kbuilder-house-switch {
+
+.kbuilder-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--kb-red);
+  box-shadow: 0 0 8px var(--kb-red);
+  animation: kb-blink 1.6s steps(2, start) infinite;
+}
+
+p.kbuilder-readout {
   display: flex;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  align-items: baseline;
+  gap: 12px;
+  margin-left: auto;
 }
-.kbuilder button.kbuilder-house-button {
-  padding: 14px 18px;
-  background-color: #fff;
-  color: #999;
-  font-size: 15px;
+p.kbuilder-readout .kbuilder-readout-label {
+  font-family: "Cascadia Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8a95a2;
+}
+p.kbuilder-readout strong {
+  color: #e9edf1;
+  font-size: 17px;
   font-weight: 500;
+  letter-spacing: 0.04em;
 }
-.kbuilder button.kbuilder-house-button:hover {
-  background-color: #fff;
-  color: #0D0D0D;
-}
-.kbuilder button.kbuilder-house-button.active {
-  background-color: #0D0D0D;
-  color: #fff;
-}
-.kbuilder button.kbuilder-download {
+
+a.kbuilder-exit {
+  font-family: "Cascadia Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 14px 22px;
-  background-color: #e91e2f;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  padding: 10px 14px 10px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  color: #e9edf1;
+  transition: border-color 0.2s, color 0.2s;
 }
-.kbuilder button.kbuilder-download svg {
+a.kbuilder-exit svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+a.kbuilder-exit:hover {
+  border-color: var(--kb-red);
+  color: #fff;
+}
+
+.kbuilder-main {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+}
+
+.kbuilder-viewport {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+  min-height: 0;
+  padding: 34px 40px 26px;
+}
+
+.kbuilder-stagebox {
+  flex: 1;
+  min-height: 0;
+  container-type: size;
+  display: grid;
+  place-items: center;
+}
+
+.kbuilder-house {
+  display: none;
+}
+.kbuilder-house.active {
+  display: block;
+  width: min(100cqw, 100cqh * var(--kb-ratio));
+}
+
+.kbuilder-stage {
+  position: relative;
+  aspect-ratio: var(--kb-ratio);
+  background: #000;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.24), 0 30px 80px rgba(0, 0, 0, 0.55);
+}
+.kbuilder-stage svg.kbuilder-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+.kbuilder-stage .kbuilder-region {
+  opacity: 0;
+  transition: opacity 0.5s ease-out, fill 0.5s ease-out;
+  pointer-events: none;
+}
+.kbuilder-stage .kbuilder-outline {
+  fill: none;
+  stroke: var(--kb-red);
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.25s;
+}
+.kbuilder-stage .kbuilder-outline path {
+  pointer-events: fill;
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+.kbuilder-stage .kbuilder-outline:hover, .kbuilder-stage .kbuilder-outline.is-hover {
+  opacity: 0.75;
+}
+.kbuilder-stage .kbuilder-outline.is-active {
+  opacity: 1;
+  filter: drop-shadow(0 0 5px rgba(233, 30, 47, 0.9));
+}
+.kbuilder-stage .kbuilder-outline.is-active path {
+  stroke-dasharray: 10 4;
+  animation: kb-march 1.2s linear infinite;
+}
+
+.kbuilder-corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 0 solid var(--kb-red);
+  pointer-events: none;
+}
+.kbuilder-corner--tl {
+  top: -9px;
+  left: -9px;
+  border-top-width: 2px;
+  border-left-width: 2px;
+}
+.kbuilder-corner--tr {
+  top: -9px;
+  right: -9px;
+  border-top-width: 2px;
+  border-right-width: 2px;
+}
+.kbuilder-corner--bl {
+  bottom: -9px;
+  left: -9px;
+  border-bottom-width: 2px;
+  border-left-width: 2px;
+}
+.kbuilder-corner--br {
+  bottom: -9px;
+  right: -9px;
+  border-bottom-width: 2px;
+  border-right-width: 2px;
+}
+
+.kbuilder-scan {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.kbuilder-scan::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -140px;
+  height: 140px;
+  background: linear-gradient(to bottom, transparent, rgba(233, 30, 47, 0.16) 80%, rgba(255, 110, 120, 0.85) 99%, transparent);
+}
+
+.is-scanning .kbuilder-scan::before {
+  animation: kb-scan 1.5s cubic-bezier(0.5, 0, 0.3, 1) 0.15s both;
+}
+
+p.kbuilder-coords {
+  font-family: "Cascadia Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  padding: 5px 8px;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(6, 8, 11, 0.6);
+  pointer-events: none;
+}
+p.kbuilder-coords span {
+  color: #fff;
+  margin-right: 8px;
+}
+
+.kbuilder-hotspots {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.kbuilder button.kbuilder-hotspot {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+.kbuilder button.kbuilder-hotspot[data-auto] {
+  visibility: hidden;
+}
+.kbuilder button.kbuilder-hotspot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--kb-red);
+  animation: kb-pulse 2.4s ease-out infinite;
+}
+.kbuilder button.kbuilder-hotspot:hover .kbuilder-hotspot-reticle, .kbuilder button.kbuilder-hotspot.is-active .kbuilder-hotspot-reticle {
+  border-color: #fff;
+  background-color: rgba(233, 30, 47, 0.55);
+}
+.kbuilder button.kbuilder-hotspot:hover .kbuilder-hotspot-label, .kbuilder button.kbuilder-hotspot.is-active .kbuilder-hotspot-label {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+.kbuilder-hotspot-reticle {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: linear-gradient(#fff, #fff) center top/1px 7px no-repeat, linear-gradient(#fff, #fff) center bottom/1px 7px no-repeat, linear-gradient(#fff, #fff) left center/7px 1px no-repeat, linear-gradient(#fff, #fff) right center/7px 1px no-repeat, rgba(6, 8, 11, 0.45);
+  backdrop-filter: blur(2px);
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.kbuilder-hotspot-reticle::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 1px dashed rgba(233, 30, 47, 0.95);
+  animation: kb-spin 9s linear infinite;
+}
+.kbuilder-hotspot-reticle::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  background: var(--kb-red);
+  box-shadow: 0 0 10px var(--kb-red);
+  transform: rotate(45deg);
+}
+
+.kbuilder-hotspot-label {
+  font-family: "Cascadia Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  position: absolute;
+  left: calc(100% + 14px);
+  top: 50%;
+  display: flex;
+  gap: 8px;
+  padding: 7px 10px;
+  white-space: nowrap;
+  color: #fff;
+  background: rgba(6, 8, 11, 0.8);
+  border-left: 2px solid var(--kb-red);
+  opacity: 0;
+  transform: translate(-6px, -50%);
+  transition: opacity 0.2s, transform 0.2s;
+}
+.kbuilder-hotspot-label b {
+  color: var(--kb-red);
+  font-weight: 700;
+}
+
+.kbuilder-models {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.kbuilder button.kbuilder-model {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 14px 5px 5px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: #8a95a2;
+  transition: border-color 0.2s, color 0.2s;
+}
+.kbuilder button.kbuilder-model img {
+  display: block;
+  width: 68px;
+  height: auto;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  opacity: 0.7;
+}
+.kbuilder button.kbuilder-model span {
+  font-family: "Cascadia Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  display: flex;
+  gap: 8px;
+}
+.kbuilder button.kbuilder-model span b {
+  color: var(--kb-red);
+}
+.kbuilder button.kbuilder-model:hover {
+  border-color: rgba(255, 255, 255, 0.24);
+  color: #e9edf1;
+}
+.kbuilder button.kbuilder-model.active {
+  border-color: var(--kb-red);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px var(--kb-red), 0 0 18px rgba(233, 30, 47, 0.25);
+}
+.kbuilder button.kbuilder-model.active img {
+  opacity: 1;
+}
+
+.kbuilder-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: rgba(10, 13, 17, 0.86);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+}
+
+.kbuilder-panel-head {
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+h2.kbuilder-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #e9edf1;
+  font-family: "AsenPro", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+h2.kbuilder-panel-title::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--kb-red);
+  box-shadow: 0 0 8px var(--kb-red);
+  transform: rotate(45deg);
+}
+
+p.kbuilder-panel-hint {
+  font-family: "Cascadia Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-top: 8px;
+  color: #8a95a2;
+}
+
+.kbuilder-panel-head p.kbuilder-notice {
+  margin: 12px 0 0;
+  padding: 8px 10px;
+  font-family: "Cascadia Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: #ffd27a;
+  background: rgba(255, 190, 60, 0.08);
+  border-left: 2px solid #ffbe3c;
+}
+
+.kbuilder-modules-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 14px 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.kbuilder-modules {
+  display: none;
+}
+.kbuilder-modules.active {
+  display: block;
+}
+
+.kbuilder-module {
+  margin-bottom: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  transition: border-color 0.2s, background-color 0.2s;
+  scroll-margin: 14px;
+}
+.kbuilder-module:hover {
+  border-color: rgba(255, 255, 255, 0.24);
+}
+.kbuilder-module.is-open {
+  border-color: rgba(233, 30, 47, 0.55);
+  background: rgba(233, 30, 47, 0.06);
+  box-shadow: inset 2px 0 0 var(--kb-red);
+}
+
+.kbuilder button.kbuilder-module-head {
+  display: grid;
+  grid-template-columns: auto 30px minmax(0, 1fr) auto 10px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 14px;
+  text-align: left;
+}
+
+.kbuilder-module-index {
+  font-family: "Cascadia Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--kb-red);
+}
+
+svg.kbuilder-module-icon {
+  width: 30px;
+  height: 28px;
+  fill: #e9edf1;
+  opacity: 0.85;
+}
+
+.kbuilder-module-label {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.kbuilder-module-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 128px;
+}
+.kbuilder-module-value .kbuilder-chip {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.kbuilder-module-finish {
+  font-family: "Cascadia Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8a95a2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kbuilder-module-caret {
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid #8a95a2;
+  border-bottom: 1.5px solid #8a95a2;
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 0.2s;
+}
+.is-open .kbuilder-module-caret {
+  border-color: var(--kb-red);
+  transform: rotate(225deg) translate(-2px, -2px);
+}
+
+.kbuilder-module-body {
+  padding: 4px 14px 16px;
+}
+
+.kbuilder-swatches {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 8px;
+}
+
+.kbuilder button.kbuilder-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  text-align: left;
+}
+.kbuilder button.kbuilder-swatch:hover .kbuilder-swatch-frame {
+  border-color: rgba(255, 255, 255, 0.24);
+}
+.kbuilder button.kbuilder-swatch:hover .kbuilder-swatch-name {
+  color: #e9edf1;
+}
+.kbuilder button.kbuilder-swatch.selected .kbuilder-swatch-frame {
+  border-color: var(--kb-red);
+  box-shadow: 0 0 14px rgba(233, 30, 47, 0.45);
+}
+.kbuilder button.kbuilder-swatch.selected .kbuilder-swatch-frame::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  border-style: solid;
+  border-width: 0 14px 14px 0;
+  border-color: transparent var(--kb-red) transparent transparent;
+}
+.kbuilder button.kbuilder-swatch.selected .kbuilder-swatch-name {
+  color: #fff;
+}
+
+.kbuilder-swatch-frame {
+  position: relative;
+  display: block;
+  padding: 3px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.kbuilder-swatch-frame .kbuilder-chip {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
+}
+
+.kbuilder-chip {
+  display: inline-block;
+  background-color: #fff;
+  background-size: cover;
+  background-position: center;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+.kbuilder-chip--original {
+  background: linear-gradient(135deg, transparent calc(50% - 1px), var(--kb-red) calc(50% - 1px), var(--kb-red) calc(50% + 1px), transparent calc(50% + 1px)), repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.08) 0 3px, transparent 3px 7px), #11151b;
+}
+
+.kbuilder-swatch-name {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #8a95a2;
+  overflow-wrap: anywhere;
+  transition: color 0.2s;
+}
+
+.kbuilder-actions {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  padding: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.kbuilder-actions svg {
+  flex: none;
   width: 18px;
   height: 18px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.5;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.kbuilder button.kbuilder-download:hover {
-  background-color: #a31e2f;
+
+.kbuilder button.kbuilder-reset {
+  font-family: "Cascadia Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 52px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  color: #8a95a2;
+  letter-spacing: 0.08em;
+  transition: color 0.2s, border-color 0.2s;
+}
+.kbuilder button.kbuilder-reset:hover {
   color: #fff;
+  border-color: #fff;
+}
+
+.kbuilder button.kbuilder-download {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 20px;
+  overflow: hidden;
+  color: #fff;
+  background: var(--kb-red);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  transition: background-color 0.2s;
+}
+.kbuilder button.kbuilder-download::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.5s ease-out;
+}
+.kbuilder button.kbuilder-download:hover {
+  background-color: #ff3346;
+}
+.kbuilder button.kbuilder-download:hover::after {
+  left: 120%;
 }
 .kbuilder button.kbuilder-download.is-busy {
-  opacity: 0.75;
   cursor: progress;
+  background-image: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.14) 0 10px, transparent 10px 20px);
+  animation: kb-stripes 0.8s linear infinite;
 }
 
 .kbuilder-modal {
+  --fluentform-primary: #e91e2f;
+  --fluentform-secondary: #e9edf1;
+  --fluentform-border-color: rgba(255, 255, 255, 0.24);
+  --fluentform-border-radius: 0;
   position: fixed;
   inset: 0;
   z-index: 100000;
@@ -327,15 +856,21 @@
   align-items: center;
   justify-content: center;
   padding: 16px;
+  color: #e9edf1;
   font-family: "AsenPro", sans-serif;
+  text-align: left;
 }
 .kbuilder-modal[hidden] {
   display: none;
 }
+.kbuilder-modal *, .kbuilder-modal *::before, .kbuilder-modal *::after {
+  box-sizing: border-box;
+}
 .kbuilder-modal .kbuilder-modal-backdrop {
   position: absolute;
   inset: 0;
-  background-color: rgba(13, 13, 13, 0.6);
+  background-color: rgba(3, 4, 6, 0.75);
+  backdrop-filter: blur(4px);
 }
 .kbuilder-modal .kbuilder-modal-dialog {
   position: relative;
@@ -344,9 +879,20 @@
   max-height: calc(100vh - 32px);
   overflow-y: auto;
   padding: 36px 32px 28px;
-  background-color: #fff;
-  border-top: solid 4px #e91e2f;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(160deg, rgba(22, 27, 34, 0.98), rgba(10, 13, 17, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow: 0 0 0 1px rgba(233, 30, 47, 0.15), 0 30px 80px rgba(0, 0, 0, 0.6);
+  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+}
+.kbuilder-modal .kbuilder-modal-dialog::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 32px;
+  width: 120px;
+  height: 2px;
+  background: var(--kb-red, #e91e2f);
+  box-shadow: 0 0 12px var(--kb-red, #e91e2f);
 }
 .kbuilder-modal button.kbuilder-modal-close {
   appearance: none;
@@ -366,13 +912,11 @@
   min-height: 0;
   cursor: pointer;
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 40px;
-  height: 40px;
-  background-color: #e91e2f;
-  border: solid 2px white;
-  z-index: 15;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
 }
 .kbuilder-modal button.kbuilder-modal-close svg {
   display: block;
@@ -380,107 +924,208 @@
   height: 100%;
 }
 .kbuilder-modal button.kbuilder-modal-close svg line {
-  stroke: #F9FDFE;
-  stroke-width: 4px;
+  stroke: #e9edf1;
+  stroke-width: 2px;
 }
 .kbuilder-modal button.kbuilder-modal-close:hover {
-  background-color: #a31e2f;
+  border-color: #e91e2f;
+  background-color: rgba(233, 30, 47, 0.2);
+}
+.kbuilder-modal p.kbuilder-modal-kicker {
+  font-family: "Cascadia Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+  padding: 0;
+  color: #e91e2f;
 }
 .kbuilder-modal h2.kbuilder-modal-title {
-  margin: 0 0 8px;
-  color: #e91e2f;
+  margin: 0 0 10px;
+  padding: 0;
+  color: #fff;
   font-family: inherit;
   font-size: 28px;
   font-weight: 500;
   line-height: 1.2;
 }
-.kbuilder-modal .kbuilder-modal-intro {
-  margin: 0 0 20px;
-  color: #555;
+.kbuilder-modal p.kbuilder-modal-intro {
+  margin: 0 0 22px;
+  padding: 0;
+  color: #8a95a2;
   font-size: 15px;
   line-height: 1.5;
+}
+.kbuilder-modal .fluentform .ff-el-input--label label {
+  font-family: "Cascadia Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8a95a2;
+}
+.kbuilder-modal .fluentform .ff-el-form-control {
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 0;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+.kbuilder-modal .fluentform .ff-el-form-control::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+.kbuilder-modal .fluentform .ff-el-form-control:focus {
+  border-color: #e91e2f;
+  background-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 1px #e91e2f;
+}
+.kbuilder-modal .fluentform .ff-btn-submit {
+  width: 100%;
+  padding: 15px 20px;
+  border: 0;
+  border-radius: 0;
+  background-color: #e91e2f;
+  color: #fff;
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+.kbuilder-modal .fluentform .ff-btn-submit:hover {
+  background-color: #ff3346;
+  opacity: 1;
+}
+.kbuilder-modal .fluentform .ff-message-success {
+  border: 1px solid rgba(25, 179, 122, 0.5);
+  background-color: rgba(25, 179, 122, 0.1);
+  color: #c9f5e4;
+  box-shadow: none;
+}
+.kbuilder-modal .fluentform .error, .kbuilder-modal .fluentform .text-danger {
+  color: #ff3346;
 }
 
 body.kbuilder-modal-open {
   overflow: hidden;
 }
 
-@media (max-width: 767px) {
-  .kbuilder .kbuilder-logo {
-    width: 110px;
-    height: 46px;
+@container kbuilder (max-width: 860px) {
+  .kbuilder-app, .kbuilder--fullscreen .kbuilder-app {
+    height: auto;
   }
-  .kbuilder .kbuilder-panel {
-    position: relative;
-    right: auto;
-    width: auto;
-    transition: none;
+  .kbuilder--fullscreen .kbuilder-app {
+    min-height: calc(100dvh - var(--kb-top));
   }
-  .kbuilder .kbuilder-panel-nav {
-    position: static;
-    display: flex;
-    gap: 6px;
-    width: auto;
-    padding: 10px 16px;
-    transform: none;
+  .kbuilder-topbar {
+    gap: 14px;
+    min-height: 54px;
+    padding: 0 14px;
   }
-  .kbuilder .kbuilder-panel-nav button.kbuilder-nav-button {
-    left: 0;
-    width: 56px;
-    height: 52px;
-    margin: 0;
-    transform: none;
-    box-shadow: none;
+  .kbuilder-topbar::after {
+    left: 14px;
+    width: 90px;
   }
-  .kbuilder .kbuilder-panel-nav button.kbuilder-nav-button.active {
-    transform: none;
-    box-shadow: none;
+  .kbuilder-brand img {
+    height: 24px;
   }
-  .kbuilder button.kbuilder-panel-close {
+  p.kbuilder-status {
     display: none;
-    top: 10px;
-    right: 16px;
   }
-  .kbuilder .kbuilder-panel.active button.kbuilder-panel-close {
+  p.kbuilder-readout {
+    gap: 8px;
+  }
+  p.kbuilder-readout strong {
+    font-size: 14px;
+  }
+  a.kbuilder-exit {
+    padding: 8px;
+  }
+  a.kbuilder-exit span {
+    display: none;
+  }
+  .kbuilder-main {
     display: block;
   }
-  .kbuilder .kbuilder-selector {
-    height: auto;
-    padding: 16px;
-    border-left: none;
-    border-top: solid 2px #e91e2f;
+  .kbuilder-viewport {
+    gap: 0;
+    padding: 0;
+    background: #06080b;
+  }
+  .kbuilder--fullscreen .kbuilder-viewport {
+    position: sticky;
+    top: var(--kb-top);
+    z-index: 2;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+  }
+  .kbuilder-stagebox {
+    container-type: normal;
+    display: block;
+  }
+  .kbuilder-house.active {
+    width: 100%;
+  }
+  .kbuilder-stage {
     box-shadow: none;
   }
-  .kbuilder .kbuilder-panel:not(.active) .kbuilder-selector {
+  .kbuilder-corner, p.kbuilder-coords {
     display: none;
   }
-  .kbuilder h2.kbuilder-selector-title {
-    font-size: 24px;
+  .kbuilder button.kbuilder-hotspot {
+    width: 30px;
+    height: 30px;
   }
-  .kbuilder .kbuilder-swatches {
-    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  .kbuilder-hotspot-label {
+    display: none;
   }
-  .kbuilder button.kbuilder-swatch .kbuilder-swatch-chip {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1;
+  .kbuilder-models {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 8px 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
-  .kbuilder .kbuilder-toolbar {
-    position: static;
-    padding: 0 16px 16px;
+  .kbuilder button.kbuilder-model {
+    flex: none;
   }
-  .kbuilder .kbuilder-house-switch {
-    width: 100%;
-    box-shadow: none;
-    border: solid 1px #ddd;
+  .kbuilder button.kbuilder-model img {
+    width: 52px;
   }
-  .kbuilder .kbuilder-house-switch button.kbuilder-house-button {
-    flex: 1;
+  .kbuilder-panel {
+    border-left: 0;
+    backdrop-filter: none;
   }
-  .kbuilder button.kbuilder-download {
-    width: 100%;
-    justify-content: center;
+  .kbuilder-panel-head {
+    padding: 16px 14px 12px;
+  }
+  .kbuilder-modules-wrap {
+    overflow: visible;
+    padding: 12px 10px 4px;
+  }
+  .kbuilder-module {
+    scroll-margin-top: calc(var(--kb-top) + 56.25cqw + 12px);
+    scroll-margin-bottom: 90px;
+  }
+  .kbuilder:has(.kbuilder-models) .kbuilder-module {
+    scroll-margin-top: calc(var(--kb-top) + 56.25cqw + 80px);
+  }
+  .kbuilder-swatches {
+    grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+  }
+  .kbuilder-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    padding: 10px;
+    background: rgba(6, 8, 11, 0.94);
+    backdrop-filter: blur(10px);
   }
 }
-
-/*# sourceMappingURL=style.css.map */
+@media (prefers-reduced-motion: reduce) {
+  .kbuilder *, .kbuilder *::before, .kbuilder *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

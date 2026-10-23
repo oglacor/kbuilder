@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  K-Builder canvas: 1920 × 1080 px, the size of every background image and zone SVG.
+  1. Place the background JPG at X 0, Y 0, W 1920, H 1080 and lock it.
+  2. Trace one zone per layer (Roof, Walls, Windows, Doors) with filled shapes.
+  3. Export each zone alone: File → Export → Export As → SVG, "Use Artboards" checked.
+  The guide frame below has no fill, so K-Builder ignores it if it's left in.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <g id="guide">
+    <rect x="0.5" y="0.5" width="1919" height="1079" fill="none" stroke="#e91e2f" stroke-width="1"/>
+  </g>
+</svg>

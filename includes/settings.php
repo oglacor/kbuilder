@@ -1,6 +1,6 @@
 <?php
 /**
- * Settings → K-Builder: lead form and PDF texts.
+ * K-Builder → Settings: lead form and PDF texts.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -43,11 +43,11 @@ function kbuilder_sanitize_settings( $input ) {
 }
 
 function kbuilder_add_settings_page() {
-	add_options_page( 'K-Builder', 'K-Builder', 'manage_options', 'kbuilder', 'kbuilder_render_settings_page' );
+	add_submenu_page( 'edit.php?post_type=' . KBUILDER_HOUSE_TYPE, __( 'K-Builder settings', 'kbuilder' ), __( 'Settings', 'kbuilder' ), 'manage_options', 'kbuilder', 'kbuilder_render_settings_page' );
 }
 
 function kbuilder_settings_link( $links ) {
-	$url = admin_url( 'options-general.php?page=kbuilder' );
+	$url = admin_url( 'edit.php?post_type=' . KBUILDER_HOUSE_TYPE . '&page=kbuilder' );
 	array_unshift( $links, '<a href="' . esc_url( $url ) . '">' . esc_html__( 'Settings', 'kbuilder' ) . '</a>' );
 
 	return $links;
@@ -132,8 +132,9 @@ function kbuilder_render_settings_page() {
 				<tr>
 					<th scope="row"><?php esc_html_e( 'Usage', 'kbuilder' ); ?></th>
 					<td>
-						<p><?php esc_html_e( 'Add this shortcode to any page:', 'kbuilder' ); ?> <code>[kbuilder]</code></p>
-						<p class="description"><?php esc_html_e( 'To start on a specific design:', 'kbuilder' ); ?> <code>[kbuilder house="house-1"]</code></p>
+						<p><?php esc_html_e( 'Full screen: edit a page and pick the template "K-Builder (full screen)" under Page Attributes → Template.', 'kbuilder' ); ?></p>
+						<p><?php esc_html_e( 'Inside a page: add the shortcode', 'kbuilder' ); ?> <code>[kbuilder]</code> <?php esc_html_e( 'or, to start on a specific model,', 'kbuilder' ); ?> <code>[kbuilder house="house-1"]</code></p>
+						<p class="description"><?php esc_html_e( 'Links can also open a model with ?modelo=slug, e.g. /kbuilder/?modelo=house-1.', 'kbuilder' ); ?></p>
 					</td>
 				</tr>
 			</table>

@@ -1,5 +1,5 @@
 /**
- * K-Builder front-end: color picking, house switching, the lead form gate and PDF export.
+ * K-Builder front-end: finish picking, house switching, the lead form gate and PDF export.
  */
 (function ($) {
     'use strict';
@@ -31,25 +31,36 @@
 
         $.each(config.houses, function (houseKey, house) {
             state.selections[houseKey] = {};
-            $.each(house.regions, function (regionKey, region) {
-                state.selections[houseKey][regionKey] = region.default || '';
-                applyColor(houseKey, regionKey);
+            $.each(house.regions, function (regionKey) {
+                state.selections[houseKey][regionKey] = '';
             });
         });
+        placeHotspots(state.house);
+        scan(state.house);
 
-        $root.on('click', '.kbuilder-hotspot, .kbuilder-nav-button', function () {
-            toggleRegion($(this).data('region'));
+        $root.on('click', '.kbuilder-module-head', function () {
+            toggleRegion($(this).closest('.kbuilder-module').data('region'));
         });
-        $root.on('click', '.kbuilder-panel-close', function () {
-            toggleRegion(null);
+        // Markers and the zones on the photo open their zone in the panel.
+        $root.on('click', '.kbuilder-hotspot, .kbuilder-outline', function () {
+            toggleRegion($(this).data('region'), true);
+        });
+        $root.on('mouseenter mouseleave', '.kbuilder-module-head', function (event) {
+            const regionKey = $(this).closest('.kbuilder-module').data('region');
+            houseEl(state.house).find(`.kbuilder-outline[data-region="${regionKey}"]`).toggleClass('is-hover', event.type === 'mouseenter');
         });
         $root.on('click', '.kbuilder-swatch', function () {
-            const regionKey = $(this).closest('.kbuilder-selector').data('region');
-            state.selections[state.house][regionKey] = $(this).data('color');
-            applyColor(state.house, regionKey);
+            const regionKey = $(this).closest('.kbuilder-module').data('region');
+            state.selections[state.house][regionKey] = $(this).attr('data-finish');
+            applyFinish(state.house, regionKey);
         });
-        $root.on('click', '.kbuilder-house-button', function () {
-            showHouse($(this).data('house'));
+        $root.on('click', '.kbuilder-model', function () {
+            showHouse($(this).attr('data-house'));
+        });
+        $root.on('click', '.kbuilder-reset', reset);
+        $root.on('mousemove', '.kbuilder-stage', trackPointer);
+        $root.on('mouseleave', '.kbuilder-stage', function () {
+            $(this).find('.kbuilder-coords-x, .kbuilder-coords-y').text('----');
         });
         $root.on('click', '.kbuilder-download', function () {
             const lead = storedLead();
@@ -83,44 +94,53 @@
             return $root.find(`.kbuilder-house[data-house="${houseKey}"]`);
         }
 
-        function selectedColor(houseKey, regionKey) {
-            const region = config.houses[houseKey].regions[regionKey];
-            const slug = state.selections[houseKey][regionKey];
-            return (slug && config.palettes[region.palette][slug]) || null;
+        function modulesEl(houseKey) {
+            return $root.find(`.kbuilder-modules[data-house="${houseKey}"]`);
         }
 
-        function applyColor(houseKey, regionKey) {
-            const color = selectedColor(houseKey, regionKey);
-            const slug = state.selections[houseKey][regionKey];
-            const $house = houseEl(houseKey);
+        function selectedFinish(houseKey, regionKey) {
+            const id = state.selections[houseKey][regionKey];
+            return (id && config.finishes[id]) || null;
+        }
 
-            $house.find(`.kbuilder-region[data-region="${regionKey}"] path`).css(color ? {
-                fill: color.hex,
-                opacity: color.opacity,
-                'mix-blend-mode': color.blend,
+        function applyFinish(houseKey, regionKey) {
+            const finish = selectedFinish(houseKey, regionKey);
+            const id = state.selections[houseKey][regionKey];
+
+            houseEl(houseKey).find(`.kbuilder-region[data-region="${regionKey}"]`).css(finish ? {
+                fill: finish.hex,
+                opacity: finish.opacity,
+                'mix-blend-mode': finish.blend,
             } : { opacity: 0 });
 
-            $house.find(`.kbuilder-selector[data-region="${regionKey}"] .kbuilder-swatch`).each(function () {
-                const selected = $(this).data('color') === slug;
+            const $module = modulesEl(houseKey).find(`.kbuilder-module[data-region="${regionKey}"]`);
+            let $chip = $();
+            $module.find('.kbuilder-swatch').each(function () {
+                const selected = $(this).attr('data-finish') === id;
                 $(this).toggleClass('selected', selected).attr('aria-pressed', selected);
+                if (selected) {
+                    $chip = $(this).find('.kbuilder-chip');
+                }
             });
+            $module.find('.kbuilder-module-value .kbuilder-chip').replaceWith($chip.clone());
+            $module.find('.kbuilder-module-finish').text(finish ? finish.name : i18n.original);
         }
 
-        function toggleRegion(regionKey) {
-            const $house = houseEl(state.house);
-            state.region = regionKey && regionKey !== state.region ? regionKey : null;
+        function toggleRegion(regionKey, open) {
+            state.region = regionKey && (open || regionKey !== state.region) ? regionKey : null;
 
-            $house.find('.kbuilder-panel').toggleClass('active', !!state.region);
-            $house.find('.kbuilder-nav-button').each(function () {
-                const active = $(this).data('region') === state.region;
-                $(this).toggleClass('active', active).attr('aria-pressed', active);
+            modulesEl(state.house).find('.kbuilder-module').each(function () {
+                const isOpen = $(this).data('region') === state.region;
+                $(this).toggleClass('is-open', isOpen);
+                $(this).find('.kbuilder-module-head').attr('aria-expanded', isOpen);
+                $(this).find('.kbuilder-module-body').prop('hidden', !isOpen);
+                if (isOpen && open) {
+                    this.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
             });
-            // When closing, keep the last list showing so the panel doesn't go blank mid-slide.
-            if (state.region) {
-                $house.find('.kbuilder-selector').each(function () {
-                    $(this).toggleClass('active', $(this).data('region') === state.region);
-                });
-            }
+            houseEl(state.house).find('.kbuilder-outline, .kbuilder-hotspot').each(function () {
+                $(this).toggleClass('is-active', $(this).data('region') === state.region);
+            });
         }
 
         function showHouse(houseKey) {
@@ -129,21 +149,62 @@
             }
             toggleRegion(null);
             state.house = houseKey;
-            $root.find('.kbuilder-house').each(function () {
-                $(this).toggleClass('active', $(this).data('house') === houseKey);
+            $root.find('.kbuilder-house, .kbuilder-modules').each(function () {
+                $(this).toggleClass('active', $(this).attr('data-house') === houseKey);
             });
-            $root.find('.kbuilder-house-button').each(function () {
-                const active = $(this).data('house') === houseKey;
+            $root.find('.kbuilder-model').each(function () {
+                const active = $(this).attr('data-house') === houseKey;
                 $(this).toggleClass('active', active).attr('aria-pressed', active);
             });
+            $root.find('.kbuilder-house-name').text(config.houses[houseKey].name);
+            placeHotspots(houseKey);
+            scan(houseKey);
+        }
+
+        function reset() {
+            $.each(state.selections[state.house], function (regionKey) {
+                state.selections[state.house][regionKey] = '';
+                applyFinish(state.house, regionKey);
+            });
+            toggleRegion(null);
+        }
+
+        // Markers without a position from the admin; measured once their house is visible.
+        function placeHotspots(houseKey) {
+            const $house = houseEl(houseKey);
+            $house.find('.kbuilder-hotspot[data-auto]').each(function () {
+                const group = $house.find(`.kbuilder-outline[data-region="${$(this).data('region')}"]`)[0];
+                const spot = group && window.kbuilderAutoHotspot ? window.kbuilderAutoHotspot(group) : null;
+                if (spot) {
+                    $(this).css({ left: `${spot[0]}%`, top: `${spot[1]}%` }).removeAttr('data-auto');
+                }
+            });
+        }
+
+        // Replays the scan line over the photo.
+        function scan(houseKey) {
+            const $stage = houseEl(houseKey).find('.kbuilder-stage').removeClass('is-scanning');
+            if ($stage.length) {
+                void $stage[0].offsetWidth;
+                $stage.addClass('is-scanning');
+            }
+        }
+
+        function trackPointer(event) {
+            const rect = this.getBoundingClientRect();
+            const house = config.houses[state.house];
+            const x = Math.round((event.clientX - rect.left) / rect.width * house.width);
+            const y = Math.round((event.clientY - rect.top) / rect.height * house.height);
+            $(this).find('.kbuilder-coords-x').text(pad(x, house.width));
+            $(this).find('.kbuilder-coords-y').text(pad(y, house.height));
         }
 
         function designSummary() {
             const house = config.houses[state.house];
             const parts = [house.name];
             $.each(house.regions, function (regionKey, region) {
-                const color = selectedColor(state.house, regionKey);
-                parts.push(`${region.label}: ${color ? color.name : i18n.original}`);
+                const finish = selectedFinish(state.house, regionKey);
+                parts.push(`${region.label}: ${finish ? finish.name : i18n.original}`);
             });
             return parts.join(' | ');
         }
@@ -182,9 +243,14 @@
             const regions = Object.keys(house.regions).map(function (regionKey) {
                 return {
                     label: house.regions[regionKey].label,
-                    color: selectedColor(houseKey, regionKey),
+                    color: selectedFinish(houseKey, regionKey),
                     shapes: houseEl(houseKey).find(`.kbuilder-region[data-region="${regionKey}"] path`).map(function () {
-                        return this.getAttribute('d');
+                        const transform = this.transform.baseVal.consolidate();
+                        return {
+                            d: this.getAttribute('d'),
+                            rule: this.getAttribute('fill-rule') || 'nonzero',
+                            matrix: transform ? transform.matrix : null,
+                        };
                     }).get(),
                 };
             });
@@ -203,6 +269,10 @@
                     $label.text(label);
                 });
         }
+    }
+
+    function pad(value, max) {
+        return String(Math.max(0, Math.min(value, max))).padStart(4, '0');
     }
 
     // Lead -------------------------------------------------------------------
@@ -366,26 +436,36 @@
 
     /**
      * Paint the house on a canvas with the same fills and blend modes as the
-     * on-screen SVG, so the PDF matches what the visitor designed.
+     * on-screen SVG, so the PDF matches what the visitor designed. Each zone
+     * is filled on its own layer first, then blended as a whole, like the
+     * zone's <g> on screen.
      */
     async function renderHouse(house, regions) {
         const canvas = document.createElement('canvas');
         canvas.width = house.width;
         canvas.height = house.height;
         const ctx = canvas.getContext('2d');
+        const layer = document.createElement('canvas');
+        layer.width = house.width;
+        layer.height = house.height;
+        const layerCtx = layer.getContext('2d');
 
         drawCover(ctx, await loadImage(house.image), canvas.width, canvas.height);
         regions.forEach(function (region) {
             if (!region.color) {
                 return;
             }
+            layerCtx.clearRect(0, 0, layer.width, layer.height);
+            layerCtx.fillStyle = region.color.hex;
+            region.shapes.forEach(function (shape) {
+                const path = new Path2D();
+                path.addPath(new Path2D(shape.d), shape.matrix || undefined);
+                layerCtx.fill(path, shape.rule);
+            });
             ctx.save();
             ctx.globalAlpha = region.color.opacity;
             ctx.globalCompositeOperation = region.color.blend === 'normal' ? 'source-over' : region.color.blend;
-            ctx.fillStyle = region.color.hex;
-            region.shapes.forEach(function (d) {
-                ctx.fill(new Path2D(d));
-            });
+            ctx.drawImage(layer, 0, 0);
             ctx.restore();
         });
 
