@@ -29,7 +29,8 @@ function kbuilder_admin_assets() {
 		wp_enqueue_media();
 		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_script( 'kbuilder-hotspot', KBUILDER_URL . 'assets/js/hotspot.js', array(), KBUILDER_VERSION, true );
-		wp_enqueue_script( 'kbuilder-admin', KBUILDER_URL . 'assets/js/admin.js', array( 'jquery', 'wp-color-picker', 'kbuilder-hotspot' ), KBUILDER_VERSION, true );
+		wp_enqueue_script( 'kbuilder-recolor', KBUILDER_URL . 'assets/js/recolor.js', array(), KBUILDER_VERSION, true );
+		wp_enqueue_script( 'kbuilder-admin', KBUILDER_URL . 'assets/js/admin.js', array( 'jquery', 'wp-color-picker', 'kbuilder-hotspot', 'kbuilder-recolor' ), KBUILDER_VERSION, true );
 		wp_localize_script(
 			'kbuilder-admin',
 			'kbuilderAdmin',

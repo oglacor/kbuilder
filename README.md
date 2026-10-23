@@ -20,7 +20,7 @@ On first load, version 2.0 creates the 1.x catalog in the admin: the "Diseño 1"
 | --- | --- | --- | --- |
 | Background image | 1920 × 1080 px exactly (16:9) | JPG, sRGB, quality ~80, under 600 KB | One per house model |
 | Zone SVG | Canvas / artboard 1920 × 1080 px, starting at 0,0 | SVG, Illustrator Export As with **Use Artboards** | One per zone: roof, walls, windows, doors (each optional) |
-| Texture swatch | Square, at least 300 × 300 px | JPG | Optional, one per finish |
+| Texture | 1024–2048 px, square or close to it | JPG, straight-on, evenly lit, seamless if possible | Optional, one per finish |
 
 The photo fills the canvas and each zone outline is drawn over it at the same position. `assets/samples/kbuilder-canvas-1920x1080.svg` is a blank canvas, and `assets/samples/house-1/` is a complete model to copy from.
 
@@ -50,12 +50,16 @@ How uploads are handled (`includes/svg.php`): the SVG file is never stored or pr
 
 **K-Builder → Finishes**, shared by every model. Each finish has:
 
-- **Color**: tints the zone over the photo, and is the swatch when there's no texture.
-- **Texture swatch**: optional image visitors pick, also printed in the PDF. The photo is still tinted with the color.
-- **Blend mode** (any CSS `mix-blend-mode`) and **opacity**: how the tint mixes with the photo. The PDF render uses the same values (canvas `globalCompositeOperation`).
+- **Color**: the finish color, and the swatch when there's no texture.
+- **Texture**: optional HD photo of the product, painted on the zone (and shown in the swatch, the lens and the PDF).
+- **Grain size** (canvas px one texture copy spans), **grain direction** (in the file) and **shading** (% of the photo's light and shadow kept).
 - **Available for**: the zones that offer it.
 
-The finish screen previews the tint live on the first house model.
+The finish screen previews the finish live on the first house model, lens included.
+
+How finishes are painted (`assets/js/recolor.js`): each zone is recolored in a canvas, not tinted with a blend mode. The photo's brightness inside the zone, relative to the zone's median and lightly blurred, multiplies the finish color or texture; highlights above the median lift towards white. The photo keeps its light and shadow but loses its original color, so light finishes work over dark frames. Textures are flattened (divided by a heavily blurred copy, which removes uneven lighting), resampled to the size they're drawn at, and tiled with mirrored repeats. On frame zones (`profile` in `kbuilder_region_types`: windows, doors) each pixel's profile direction is taken from the mask's horizontal vs vertical run length, and the grain is turned to follow it. The screen, the lens (the same render, sampled at a higher resolution around the zone's marker) and the PDF share these pixels. Media must be same-origin, or served with CORS headers, so the canvas can read them.
+
+When a zone is open, the builder shows the **lens**: a round close-up of the zone with its finish and name, placed in the nearest stage corner that doesn't cover the spot. The PDF prints the same close-up for every zone.
 
 ## Lead form (Fluent Forms)
 
@@ -71,12 +75,13 @@ The PDF is generated in the browser (jsPDF, bundled in `assets/vendor`), so the 
 ## Code map
 
 - `includes/post-types.php`: the `kbuilder_house` and `kbuilder_finish` post types (private; editors and up can manage them).
-- `includes/catalog.php`: zone types, blend modes, and the readers that turn posts into the arrays the builder uses.
+- `includes/catalog.php`: zone types and the readers that turn posts into the arrays the builder uses.
 - `includes/svg.php`: zone SVG parser.
 - `includes/install.php`: one-time creation of the 1.x catalog.
 - `includes/shortcode.php`, `includes/page-template.php`, `templates/builder.php`, `templates/fullscreen.php`: front end.
 - `includes/admin*.php`, `templates/admin-guide.php`, `assets/js/admin.js`: admin screens.
 - `assets/js/hotspot.js`: automatic marker placement, shared by the builder and the admin preview.
+- `assets/js/recolor.js`: the finish renderer (screen, lens, PDF, admin preview).
 
 Filters: `kbuilder_region_types` (add a zone type, e.g. a gate), `kbuilder_finishes`, `kbuilder_houses`, `kbuilder_js_config`.
 

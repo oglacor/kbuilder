@@ -39,9 +39,9 @@ $settings = admin_url( 'edit.php?post_type=' . KBUILDER_HOUSE_TYPE . '&page=kbui
 				<td>One per zone: roof, walls, windows, doors (each optional)</td>
 			</tr>
 			<tr>
-				<td><strong>Texture swatch</strong></td>
-				<td>Square, at least 300 × 300 px</td>
-				<td>JPG</td>
+				<td><strong>Texture</strong></td>
+				<td>1024–2048 px, square or close to it</td>
+				<td>JPG, straight-on, evenly lit, seamless (tileable) if possible</td>
 				<td>Optional, one per finish (wood grain, metal…)</td>
 			</tr>
 		</tbody>
@@ -112,14 +112,16 @@ $settings = admin_url( 'edit.php?post_type=' . KBUILDER_HOUSE_TYPE . '&page=kbui
 	<p>Finishes are shared by every house model. Name them like the product catalog (e.g. "Nogal", "Roble Dorado"), so the PDF a visitor downloads matches what they can order.</p>
 	<table class="widefat striped">
 		<tbody>
-			<tr><th>Color</th><td>Tints the zone over the photo. For a texture finish, pick the texture's average color.</td></tr>
-			<tr><th>Texture swatch</th><td>Optional square photo of the product (wood grain, anodized metal). Visitors pick it and it appears in the PDF.</td></tr>
-			<tr><th>Blend mode</th><td><strong>Multiply</strong> for most colors (keeps shadows), <strong>Color</strong> for whites and greys on walls, <strong>Screen</strong> for white on dark surfaces, <strong>Normal</strong> + low opacity for flat light colors.</td></tr>
-			<tr><th>Opacity</th><td>Strength of the tint. 80–100% for paint; 50–80% for frame finishes.</td></tr>
+			<tr><th>Color</th><td>The finish color. The zone takes this color while keeping the photo's light and shadow, so a white frame looks white even if the photo's frames are dark. For a texture finish, pick the texture's average color (used in lists and as a fallback).</td></tr>
+			<tr><th>Texture</th><td>Optional HD photo of the real product (wood grain, anodized metal), 1024–2048 px. It's painted on the zone, and visitors see it in the swatch, the lens close-up and the PDF. Lighting differences in the photo are evened out automatically, and copies are mirrored so seams don't show; a seamless texture still looks best.</td></tr>
+			<tr><th>Grain size</th><td>How much of the 1920 px house one copy of the texture covers. Start at 100 px and compare with the real product in the preview: smaller makes the grain finer.</td></tr>
+			<tr><th>Grain direction</th><td>How the grain runs in the texture file. On windows and doors it's turned to run along each profile, vertical on the jambs and horizontal on the rails.</td></tr>
+			<tr><th>Shading</th><td>How much of the photo's light and shadow shows on the finish. 100% = as in the photo; lower it for flatter, matte finishes, raise it for more depth.</td></tr>
 			<tr><th>Available for</th><td>The zones that offer it: paints for Walls and Roof, profile finishes for Windows and Doors.</td></tr>
 		</tbody>
 	</table>
-	<p>The <strong>Preview</strong> on the finish screen shows the tint on a real house model as you change the settings. The Order box sets the swatch order.</p>
+	<p>The <strong>Preview</strong> on the finish screen paints the finish on a real house model as you change the settings, with the same close-up visitors see in the lens. The Order box sets the swatch order.</p>
+	<p>In the builder, opening a zone shows the <strong>lens</strong>: a round close-up of that zone with the chosen finish and its name. The PDF shows the same close-up for every zone.</p>
 
 	<h2 id="page">5. Showing the builder</h2>
 	<ul>

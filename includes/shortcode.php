@@ -15,7 +15,8 @@ function kbuilder_register_assets() {
 	wp_register_style( 'kbuilder', KBUILDER_URL . 'assets/css/style.css', array( 'kbuilder-fonts' ), KBUILDER_VERSION );
 	wp_register_script( 'kbuilder-jspdf', KBUILDER_URL . 'assets/vendor/jspdf/jspdf.umd.min.js', array(), '4.2.1', true );
 	wp_register_script( 'kbuilder-hotspot', KBUILDER_URL . 'assets/js/hotspot.js', array(), KBUILDER_VERSION, true );
-	wp_register_script( 'kbuilder', KBUILDER_URL . 'assets/js/kbuilder.js', array( 'jquery', 'kbuilder-jspdf', 'kbuilder-hotspot' ), KBUILDER_VERSION, true );
+	wp_register_script( 'kbuilder-recolor', KBUILDER_URL . 'assets/js/recolor.js', array(), KBUILDER_VERSION, true );
+	wp_register_script( 'kbuilder', KBUILDER_URL . 'assets/js/kbuilder.js', array( 'jquery', 'kbuilder-jspdf', 'kbuilder-hotspot', 'kbuilder-recolor' ), KBUILDER_VERSION, true );
 }
 
 function kbuilder_register_shortcode() {
@@ -106,14 +107,17 @@ function kbuilder_render( $args = array() ) {
 
 /**
  * Data the front-end script needs. Shapes stay in the SVG markup; the script
- * reads them from there when it renders the PDF.
+ * reads them from there to paint the finishes.
  */
 function kbuilder_get_js_config( $houses, $finishes, $active_house, $settings, $has_form ) {
 	$houses_js = array();
 	foreach ( $houses as $house_key => $house ) {
 		$regions = array();
 		foreach ( $house['regions'] as $region_key => $region ) {
-			$regions[ $region_key ] = array( 'label' => $region['label'] );
+			$regions[ $region_key ] = array(
+				'label'   => $region['label'],
+				'profile' => $region['profile'],
+			);
 		}
 		$houses_js[ $house_key ] = array(
 			'name'    => $house['name'],

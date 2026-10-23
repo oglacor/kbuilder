@@ -1,5 +1,6 @@
 /**
- * K-Builder front-end: finish picking, house switching, the lead form gate and PDF export.
+ * K-Builder front-end: finish picking, house switching, the lens, the lead form gate and PDF export.
+ * Finishes are painted by assets/js/recolor.js; screen, lens and PDF use the same pixels.
  */
 (function ($) {
     'use strict';
@@ -11,6 +12,8 @@
     const GREY = '#7a7a7a';
     const LINE = '#dcdcdc';
     const LOGO_PX = 1200;
+    const LENS_SPAN = 72; // canvas px seen across the lens
+    const DETAIL_PX = 360; // size of the PDF close-ups
 
     $(function () {
         $('.kbuilder').each(function () {
@@ -27,6 +30,9 @@
         // The modal lives in <body> so theme transforms or overflow can't trap a position:fixed overlay.
         const $modal = $root.find('.kbuilder-modal').appendTo(document.body);
         const state = { house: config.house, region: null, selections: {}, busy: false };
+        const scenes = {};
+        const paintTokens = {};
+        let lensToken = 0;
         let lastFocus = null;
 
         $.each(config.houses, function (houseKey, house) {
@@ -71,6 +77,13 @@
             }
         });
 
+        // The lens size is a share of the stage, which changes at the compact breakpoint.
+        let resizeTimer = null;
+        $(window).on('resize', function () {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(updateLens, 200);
+        });
+
         $modal.on('click', '[data-kbuilder-close]', closeModal);
         $(document).on('keydown', function (event) {
             if (event.key === 'Escape' && $modal.length && !$modal.prop('hidden')) {
@@ -103,15 +116,41 @@
             return (id && config.finishes[id]) || null;
         }
 
+        // Zones with a finish, in paint order.
+        function layersOf(houseKey) {
+            return Object.keys(config.houses[houseKey].regions).map(function (regionKey) {
+                return { zone: regionKey, finish: selectedFinish(houseKey, regionKey) };
+            }).filter(function (layer) {
+                return layer.finish;
+            });
+        }
+
+        // The house's photo and zones, ready to paint. Built on first use.
+        function sceneFor(houseKey) {
+            if (!scenes[houseKey]) {
+                const house = config.houses[houseKey];
+                scenes[houseKey] = loadImage(house.image).then(function (image) {
+                    const scene = new window.KBuilderRecolor.Scene(image, house.width, house.height);
+                    $.each(house.regions, function (regionKey, region) {
+                        const shapes = houseEl(houseKey).find(`.kbuilder-outline[data-region="${regionKey}"] path`).map(function () {
+                            const transform = this.transform.baseVal.consolidate();
+                            return {
+                                d: this.getAttribute('d'),
+                                rule: this.getAttribute('fill-rule') || 'nonzero',
+                                matrix: transform ? transform.matrix : null,
+                            };
+                        }).get();
+                        scene.addZone(regionKey, shapes, region.profile);
+                    });
+                    return scene;
+                });
+            }
+            return scenes[houseKey];
+        }
+
         function applyFinish(houseKey, regionKey) {
             const finish = selectedFinish(houseKey, regionKey);
             const id = state.selections[houseKey][regionKey];
-
-            houseEl(houseKey).find(`.kbuilder-region[data-region="${regionKey}"]`).css(finish ? {
-                fill: finish.hex,
-                opacity: finish.opacity,
-                'mix-blend-mode': finish.blend,
-            } : { opacity: 0 });
 
             const $module = modulesEl(houseKey).find(`.kbuilder-module[data-region="${regionKey}"]`);
             let $chip = $();
@@ -124,6 +163,135 @@
             });
             $module.find('.kbuilder-module-value .kbuilder-chip').replaceWith($chip.clone());
             $module.find('.kbuilder-module-finish').text(finish ? finish.name : i18n.original);
+
+            paint(houseKey);
+            if (houseKey === state.house && regionKey === state.region) {
+                updateLens();
+            }
+        }
+
+        function paint(houseKey) {
+            const token = (paintTokens[houseKey] || 0) + 1;
+            paintTokens[houseKey] = token;
+            const layers = layersOf(houseKey);
+            const $stage = houseEl(houseKey).find('.kbuilder-stage');
+            if (!layers.length) {
+                $stage.removeClass('is-painted');
+                return;
+            }
+            $stage.addClass('is-painting');
+            sceneFor(houseKey)
+                .then(function (scene) {
+                    return scene.render(layers);
+                })
+                .then(function (image) {
+                    if (token === paintTokens[houseKey]) {
+                        $stage.find('.kbuilder-paint')[0].getContext('2d').putImageData(image, 0, 0);
+                        $stage.addClass('is-painted');
+                    }
+                })
+                .catch(report)
+                .then(function () {
+                    if (token === paintTokens[houseKey]) {
+                        $stage.removeClass('is-painting');
+                    }
+                });
+        }
+
+        /**
+         * The lens: a close-up of the open zone with its finish and name, in a
+         * stage corner near the spot it magnifies.
+         */
+        function updateLens() {
+            const token = ++lensToken;
+            const houseKey = state.house;
+            const regionKey = state.region;
+            const $stage = houseEl(houseKey).find('.kbuilder-stage');
+            $root.find('.kbuilder-stage').not($stage).removeClass('has-lens');
+            if (!regionKey) {
+                $stage.removeClass('has-lens');
+                return;
+            }
+
+            const house = config.houses[houseKey];
+            const finish = selectedFinish(houseKey, regionKey);
+            const $lens = $stage.find('.kbuilder-lens');
+            $lens.find('.kbuilder-lens-zone').text(house.regions[regionKey].label);
+            $lens.find('.kbuilder-lens-finish').text(finish ? finish.name : i18n.original);
+
+            sceneFor(houseKey)
+                .then(function (scene) {
+                    const focus = scene.focus(regionKey, hotspotPoint(houseKey, regionKey));
+                    if (!focus || token !== lensToken) {
+                        return null;
+                    }
+                    placeLens($stage, house, focus);
+                    const canvas = $lens.find('canvas')[0];
+                    const size = Math.round(Math.min(Math.max(canvas.clientWidth, 100) * Math.min(window.devicePixelRatio || 1, 2), 520));
+                    return scene.renderLens(layersOf(houseKey), focus[0], focus[1], LENS_SPAN, size).then(function (image) {
+                        if (token !== lensToken) {
+                            return;
+                        }
+                        canvas.width = size;
+                        canvas.height = size;
+                        canvas.getContext('2d').putImageData(image, 0, 0);
+                        $stage.addClass('has-lens');
+                    });
+                })
+                .catch(report);
+        }
+
+        function placeLens($stage, house, focus) {
+            const W = house.width;
+            const H = house.height;
+            const $lens = $stage.find('.kbuilder-lens');
+            // Everything below is in canvas units; the stage has the canvas's proportions.
+            const radius = $lens[0].offsetWidth / $stage[0].offsetWidth * W / 2;
+            const margin = W * 0.025;
+            const corners = [
+                [margin + radius, margin + radius],
+                [W - margin - radius, margin + radius],
+                [margin + radius, H - margin - radius],
+                [W - margin - radius, H - margin - radius],
+            ];
+            // Nearest corner where the lens doesn't cover the spot it magnifies (else the farthest).
+            const distances = corners.map(function (corner) {
+                return Math.hypot(corner[0] - focus[0], corner[1] - focus[1]);
+            });
+            let pick = -1;
+            distances.forEach(function (distance, index) {
+                if (distance > radius * 1.6 && (pick < 0 || distance < distances[pick])) {
+                    pick = index;
+                }
+            });
+            if (pick < 0) {
+                pick = distances.indexOf(Math.max.apply(null, distances));
+            }
+            const centre = corners[pick];
+            $lens.css({ left: `${(centre[0] - radius) / W * 100}%`, top: `${(centre[1] - radius) / H * 100}%` })
+                .toggleClass('is-low', centre[1] > H / 2);
+
+            // Leader line from the lens rim to the magnified spot.
+            const dx = focus[0] - centre[0];
+            const dy = focus[1] - centre[1];
+            const length = Math.hypot(dx, dy) || 1;
+            $stage.find('.kbuilder-lens-link line').attr({
+                x1: centre[0] + dx / length * radius,
+                y1: centre[1] + dy / length * radius,
+                x2: focus[0],
+                y2: focus[1],
+            });
+            $stage.find('.kbuilder-lens-link circle').attr({ cx: focus[0], cy: focus[1] });
+        }
+
+        // The zone's marker position in canvas px, or null while it hasn't been placed.
+        function hotspotPoint(houseKey, regionKey) {
+            const house = config.houses[houseKey];
+            const marker = houseEl(houseKey).find(`.kbuilder-hotspot[data-region="${regionKey}"]`)[0];
+            if (!marker || marker.hasAttribute('data-auto')) {
+                return null;
+            }
+            return [parseFloat(marker.style.left) / 100 * house.width, parseFloat(marker.style.top) / 100 * house.height];
         }
 
         function toggleRegion(regionKey, open) {
@@ -141,6 +309,7 @@
             houseEl(state.house).find('.kbuilder-outline, .kbuilder-hotspot').each(function () {
                 $(this).toggleClass('is-active', $(this).data('region') === state.region);
             });
+            updateLens();
         }
 
         function showHouse(houseKey) {
@@ -234,33 +403,42 @@
             }
             state.busy = true;
             const houseKey = state.house;
+            const house = config.houses[houseKey];
+            const keys = Object.keys(house.regions);
+            const layers = layersOf(houseKey);
             const $button = $root.find('.kbuilder-download').prop('disabled', true).addClass('is-busy');
             const $label = $button.find('.kbuilder-download-label');
             const label = $label.text();
             $label.text(i18n.generating);
 
-            const house = config.houses[houseKey];
-            const regions = Object.keys(house.regions).map(function (regionKey) {
-                return {
-                    label: house.regions[regionKey].label,
-                    color: selectedFinish(houseKey, regionKey),
-                    shapes: houseEl(houseKey).find(`.kbuilder-region[data-region="${regionKey}"] path`).map(function () {
-                        const transform = this.transform.baseVal.consolidate();
+            return sceneFor(houseKey)
+                .then(function (scene) {
+                    return Promise.all([
+                        scene.render(layers).then(toJpeg),
+                        // A close-up of every zone, like the lens shows.
+                        Promise.all(keys.map(function (regionKey) {
+                            const focus = scene.focus(regionKey, hotspotPoint(houseKey, regionKey));
+                            return focus
+                                ? scene.renderLens(layers, focus[0], focus[1], LENS_SPAN, DETAIL_PX).then(window.KBuilderRecolor.circleImage)
+                                : null;
+                        })),
+                    ]);
+                })
+                .then(function (rendered) {
+                    const regions = keys.map(function (regionKey, index) {
                         return {
-                            d: this.getAttribute('d'),
-                            rule: this.getAttribute('fill-rule') || 'nonzero',
-                            matrix: transform ? transform.matrix : null,
+                            label: house.regions[regionKey].label,
+                            color: selectedFinish(houseKey, regionKey),
+                            detail: rendered[1][index],
                         };
-                    }).get(),
-                };
-            });
-
-            return buildPdf(config, house, regions, lead)
+                    });
+                    return buildPdf(config, house, regions, rendered[0], lead);
+                })
                 .then(function (doc) {
                     doc.save(`${config.pdf.filename}-${houseKey}.pdf`);
                 })
                 .catch(function (error) {
-                    console.error('[kbuilder]', error);
+                    report(error);
                     window.alert(i18n.pdfError);
                 })
                 .then(function () {
@@ -273,6 +451,10 @@
 
     function pad(value, max) {
         return String(Math.max(0, Math.min(value, max))).padStart(4, '0');
+    }
+
+    function report(error) {
+        console.error('[kbuilder]', error);
     }
 
     // Lead -------------------------------------------------------------------
@@ -305,31 +487,25 @@
 
     // PDF --------------------------------------------------------------------
 
-    async function buildPdf(config, house, regions, lead) {
-        const [photo, logo, textures] = await Promise.all([
-            renderHouse(house, regions),
-            loadLogo(config.pdf.logo).catch(function () {
-                return null;
-            }),
-            Promise.all(regions.map(function (region) {
-                return region.color && region.color.texture
-                    ? loadSquare(region.color.texture).catch(function () {
-                        return null;
-                    })
-                    : null;
-            })),
-        ]);
+    /**
+     * @param {string} photo   JPEG data URL of the painted house.
+     * @param {Array}  regions [{ label, color: finish or null, detail: circular PNG data URL or null }]
+     */
+    async function buildPdf(config, house, regions, photo, lead) {
+        const logo = await loadLogo(config.pdf.logo).catch(function () {
+            return null;
+        });
 
         const doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
         doc.setProperties({ title: `K-Builder - ${house.name}`, creator: 'K-Builder' });
-        writePdf(doc, { config, house, regions, photo, logo, textures, lead });
+        writePdf(doc, { config, house, regions, photo, logo, lead });
 
         return doc;
     }
 
     function writePdf(doc, data) {
         const { width: W, height: H, margin: M } = PAGE;
-        const { config, house, regions, photo, logo, textures, lead } = data;
+        const { config, house, regions, photo, logo, lead } = data;
         const i18n = config.i18n;
 
         // Header
@@ -359,26 +535,26 @@
         const imageHeight = imageWidth * house.height / house.width;
         doc.addImage(photo, 'JPEG', M, imageTop, imageWidth, imageHeight);
 
-        // Selections, beside the render
+        // Selections, beside the render: a close-up of each zone and its finish.
         const colX = M + imageWidth + 9;
         const colWidth = W - M - colX;
-        const chip = 15;
-        const step = Math.min(23, (imageHeight - 10) / Math.max(regions.length, 1));
+        const chip = 17;
+        const step = Math.min(25, (imageHeight - 10) / Math.max(regions.length, 1));
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(12);
         doc.setTextColor(DARK);
         doc.text(i18n.selections, colX, imageTop + 4);
         regions.forEach(function (region, index) {
-            const y = imageTop + 10 + index * step;
-            drawChip(doc, region.color, textures[index], colX, y, chip);
+            const y = imageTop + 9 + index * step;
+            drawDetail(doc, region, colX, y, chip);
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(8.5);
             doc.setTextColor(GREY);
-            doc.text(region.label.toUpperCase(), colX + chip + 4, y + 5);
+            doc.text(region.label.toUpperCase(), colX + chip + 4, y + 6.5);
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(11);
             doc.setTextColor(DARK);
-            doc.text(doc.splitTextToSize(region.color ? region.color.name : i18n.original, colWidth - chip - 4), colX + chip + 4, y + 10.5);
+            doc.text(doc.splitTextToSize(region.color ? region.color.name : i18n.original, colWidth - chip - 4), colX + chip + 4, y + 12);
         });
 
         // Next steps
@@ -407,21 +583,18 @@
         }
     }
 
-    function drawChip(doc, color, texture, x, y, size) {
-        if (texture) {
-            doc.addImage(texture, 'JPEG', x, y, size, size);
-        } else if (color) {
-            doc.setFillColor(color.hex);
-            doc.rect(x, y, size, size, 'F');
+    // Circular close-up of the zone, ringed like the on-screen lens.
+    function drawDetail(doc, region, x, y, size) {
+        const r = size / 2;
+        if (region.detail) {
+            doc.addImage(region.detail, 'PNG', x, y, size, size);
         } else {
-            // Nothing picked: the photo's original finish.
-            doc.setDrawColor(LINE);
-            doc.setLineWidth(0.3);
-            doc.line(x, y + size, x + size, y);
+            doc.setFillColor(region.color ? region.color.hex : '#ffffff');
+            doc.circle(x + r, y + r, r, 'F');
         }
-        doc.setDrawColor('#b4b4b4');
-        doc.setLineWidth(0.3);
-        doc.rect(x, y, size, size, 'S');
+        doc.setDrawColor(region.color ? RED : '#b4b4b4');
+        doc.setLineWidth(0.5);
+        doc.circle(x + r, y + r, r, 'S');
     }
 
     function formatDate(locale) {
@@ -434,59 +607,11 @@
 
     // Images -----------------------------------------------------------------
 
-    /**
-     * Paint the house on a canvas with the same fills and blend modes as the
-     * on-screen SVG, so the PDF matches what the visitor designed. Each zone
-     * is filled on its own layer first, then blended as a whole, like the
-     * zone's <g> on screen.
-     */
-    async function renderHouse(house, regions) {
+    function toJpeg(imageData) {
         const canvas = document.createElement('canvas');
-        canvas.width = house.width;
-        canvas.height = house.height;
-        const ctx = canvas.getContext('2d');
-        const layer = document.createElement('canvas');
-        layer.width = house.width;
-        layer.height = house.height;
-        const layerCtx = layer.getContext('2d');
-
-        drawCover(ctx, await loadImage(house.image), canvas.width, canvas.height);
-        regions.forEach(function (region) {
-            if (!region.color) {
-                return;
-            }
-            layerCtx.clearRect(0, 0, layer.width, layer.height);
-            layerCtx.fillStyle = region.color.hex;
-            region.shapes.forEach(function (shape) {
-                const path = new Path2D();
-                path.addPath(new Path2D(shape.d), shape.matrix || undefined);
-                layerCtx.fill(path, shape.rule);
-            });
-            ctx.save();
-            ctx.globalAlpha = region.color.opacity;
-            ctx.globalCompositeOperation = region.color.blend === 'normal' ? 'source-over' : region.color.blend;
-            ctx.drawImage(layer, 0, 0);
-            ctx.restore();
-        });
-
-        return canvas.toDataURL('image/jpeg', 0.9);
-    }
-
-    // Canvas equivalent of preserveAspectRatio="xMidYMid slice".
-    function drawCover(ctx, image, width, height) {
-        const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
-        const w = image.naturalWidth * scale;
-        const h = image.naturalHeight * scale;
-        ctx.drawImage(image, (width - w) / 2, (height - h) / 2, w, h);
-    }
-
-    async function loadSquare(src, size = 240) {
-        const image = await loadImage(src);
-        const side = Math.min(image.naturalWidth, image.naturalHeight);
-        const canvas = document.createElement('canvas');
-        canvas.width = size;
-        canvas.height = size;
-        canvas.getContext('2d').drawImage(image, (image.naturalWidth - side) / 2, (image.naturalHeight - side) / 2, side, side, 0, 0, size, size);
+        canvas.width = imageData.width;
+        canvas.height = imageData.height;
+        canvas.getContext('2d').putImageData(imageData, 0, 0);
 
         return canvas.toDataURL('image/jpeg', 0.9);
     }
@@ -525,17 +650,6 @@
     }
 
     function loadImage(src) {
-        return new Promise(function (resolve, reject) {
-            const image = new Image();
-            // Keeps the canvas exportable if assets are served from a CORS-enabled CDN.
-            image.crossOrigin = 'anonymous';
-            image.onload = function () {
-                resolve(image);
-            };
-            image.onerror = function () {
-                reject(new Error(`Could not load ${src}`));
-            };
-            image.src = src;
-        });
+        return window.KBuilderRecolor.loadImage(src);
     }
 })(jQuery);

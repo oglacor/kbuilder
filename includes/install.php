@@ -52,30 +52,29 @@ function kbuilder_install_finishes() {
 	$paint  = array( 'walls', 'roof' );
 	$frames = array( 'windows', 'doors' );
 
-	// name, hex, blend, opacity, zones, texture file.
+	// name, hex, zones, texture file.
 	$finishes = array(
-		array( 'Blanco', '#F9FDFE', 'color', 100, array( 'walls' ) ),
-		// On the roof, white brightens the cap instead of desaturating it.
-		array( 'Blanco', '#F9FDFE', 'screen', 100, array( 'roof' ) ),
-		array( 'Rosa Mexicano', '#E4007C', 'multiply', 80, $paint ),
-		array( 'Azul Cobalto', '#0047AB', 'multiply', 100, $paint ),
-		array( 'Mostaza', '#EAC102', 'multiply', 100, $paint ),
-		array( 'Terracotta', '#AD7D60', 'multiply', 100, $paint ),
-		array( 'Tezontle', '#A55749', 'multiply', 100, $paint ),
-		array( 'Gris Cantera', '#B6B6B6', 'multiply', 100, $paint ),
-		array( 'Gris Concreto', '#878883', 'multiply', 100, $paint ),
-		array( 'Rojo', '#E91E2F', 'multiply', 80, $paint ),
-		array( 'Aqua', '#00A99D', 'multiply', 100, $paint ),
-		array( 'Blanco', '#F9FDFE', 'normal', 60, $frames ),
-		array( 'Caoba', '#321616', 'darken', 80, $frames, 'mahogany.jpg' ),
-		array( 'Roble', '#8F5D19', 'multiply', 50, $frames, 'oak.jpg' ),
-		array( 'Gris Antracita', '#2E2F2A', 'multiply', 80, $frames, 'bronze.jpg' ),
-		array( 'Nogal', '#5C4026', 'multiply', 80, $frames, 'nogal.jpg' ),
-		array( 'Negro', '#0D0D0D', 'normal', 80, $frames ),
-		array( 'Café Decor', '#1C1209', 'multiply', 80, $frames ),
-		array( 'Fresno Americano', '#999280', 'multiply', 80, $frames, 'shiefeld.jpg' ),
-		array( 'Plata', '#B3B3B3', 'hue', 100, $frames ),
-		array( 'Beige', '#D8CFBD', 'normal', 50, $frames ),
+		array( 'Blanco', '#F9FDFE', array( 'walls' ) ),
+		array( 'Blanco', '#F9FDFE', array( 'roof' ) ),
+		array( 'Rosa Mexicano', '#E4007C', $paint ),
+		array( 'Azul Cobalto', '#0047AB', $paint ),
+		array( 'Mostaza', '#EAC102', $paint ),
+		array( 'Terracotta', '#AD7D60', $paint ),
+		array( 'Tezontle', '#A55749', $paint ),
+		array( 'Gris Cantera', '#B6B6B6', $paint ),
+		array( 'Gris Concreto', '#878883', $paint ),
+		array( 'Rojo', '#E91E2F', $paint ),
+		array( 'Aqua', '#00A99D', $paint ),
+		array( 'Blanco', '#F9FDFE', $frames ),
+		array( 'Caoba', '#321616', $frames, 'mahogany.jpg' ),
+		array( 'Roble', '#8F5D19', $frames, 'oak.jpg' ),
+		array( 'Gris Antracita', '#2E2F2A', $frames, 'bronze.jpg' ),
+		array( 'Nogal', '#5C4026', $frames, 'nogal.jpg' ),
+		array( 'Negro', '#0D0D0D', $frames ),
+		array( 'Café Decor', '#1C1209', $frames ),
+		array( 'Fresno Americano', '#999280', $frames, 'shiefeld.jpg' ),
+		array( 'Plata', '#B3B3B3', $frames ),
+		array( 'Beige', '#D8CFBD', $frames ),
 	);
 
 	foreach ( $finishes as $order => $finish ) {
@@ -90,16 +89,14 @@ function kbuilder_install_finishes() {
 		if ( ! $post_id || is_wp_error( $post_id ) ) {
 			continue;
 		}
-		$texture = isset( $finish[5] ) ? kbuilder_install_attachment( KBUILDER_DIR . 'assets/samples/textures/' . $finish[5], $finish[0], 'kbuilder-' . $finish[5] ) : 0;
+		$texture = isset( $finish[3] ) ? kbuilder_install_attachment( KBUILDER_DIR . 'assets/samples/textures/' . $finish[3], $finish[0], 'kbuilder-' . $finish[3] ) : 0;
 		update_post_meta(
 			$post_id,
 			KBUILDER_FINISH_META,
 			array(
 				'hex'     => $finish[1],
 				'texture' => $texture,
-				'blend'   => $finish[2],
-				'opacity' => $finish[3],
-				'regions' => $finish[4],
+				'regions' => $finish[2],
 			)
 		);
 	}

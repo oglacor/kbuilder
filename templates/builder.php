@@ -41,15 +41,21 @@ $original_chip = '<span class="kbuilder-chip kbuilder-chip--original"></span>';
 				<div class="kbuilder-stagebox">
 					<?php foreach ( $houses as $house_key => $house ) : ?>
 						<div class="kbuilder-house<?php echo $house_key === $active_house ? ' active' : ''; ?>" data-house="<?php echo esc_attr( $house_key ); ?>" style="--kb-ratio: <?php echo esc_attr( round( $house['width'] / $house['height'], 4 ) ); ?>;">
+							<?php $view_box = '0 0 ' . (int) $house['width'] . ' ' . (int) $house['height']; ?>
 							<div class="kbuilder-stage">
-								<svg class="kbuilder-canvas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 <?php echo (int) $house['width']; ?> <?php echo (int) $house['height']; ?>" role="img" aria-label="<?php echo esc_attr( $house['name'] ); ?>">
+								<svg class="kbuilder-photo" xmlns="http://www.w3.org/2000/svg" viewBox="<?php echo esc_attr( $view_box ); ?>" aria-hidden="true">
 									<image href="<?php echo esc_url( $house['image'] ); ?>" x="0" y="0" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"/>
-									<?php foreach ( $house['regions'] as $region_key => $region ) : ?>
-										<g class="kbuilder-region" data-region="<?php echo esc_attr( $region_key ); ?>"><?php kbuilder_print_shapes( $region['shapes'] ); ?></g>
-									<?php endforeach; ?>
+								</svg>
+								<?php // The photo with the chosen finishes, painted by assets/js/recolor.js. ?>
+								<canvas class="kbuilder-paint" width="<?php echo (int) $house['width']; ?>" height="<?php echo (int) $house['height']; ?>" aria-hidden="true"></canvas>
+								<svg class="kbuilder-canvas" xmlns="http://www.w3.org/2000/svg" viewBox="<?php echo esc_attr( $view_box ); ?>" role="img" aria-label="<?php echo esc_attr( $house['name'] ); ?>">
 									<?php foreach ( $house['regions'] as $region_key => $region ) : ?>
 										<g class="kbuilder-outline" data-region="<?php echo esc_attr( $region_key ); ?>"><?php kbuilder_print_shapes( $region['shapes'] ); ?></g>
 									<?php endforeach; ?>
+								</svg>
+								<svg class="kbuilder-lens-link" xmlns="http://www.w3.org/2000/svg" viewBox="<?php echo esc_attr( $view_box ); ?>" aria-hidden="true">
+									<line x1="0" y1="0" x2="0" y2="0"/>
+									<circle cx="0" cy="0" r="9"/>
 								</svg>
 								<div class="kbuilder-hotspots">
 									<?php $number = 0; ?>
@@ -65,6 +71,11 @@ $original_chip = '<span class="kbuilder-chip kbuilder-chip--original"></span>';
 											<span class="kbuilder-hotspot-label" aria-hidden="true"><b><?php echo esc_html( sprintf( '%02d', $number ) ); ?></b><?php echo esc_html( $region['label'] ); ?></span>
 										</button>
 									<?php endforeach; ?>
+								</div>
+								<?php // Close-up of the open zone's finish. ?>
+								<div class="kbuilder-lens" aria-live="polite">
+									<canvas class="kbuilder-lens-canvas" width="400" height="400" aria-hidden="true"></canvas>
+									<p class="kbuilder-lens-label"><span class="kbuilder-lens-zone"></span><strong class="kbuilder-lens-finish"></strong></p>
 								</div>
 								<span class="kbuilder-corner kbuilder-corner--tl" aria-hidden="true"></span>
 								<span class="kbuilder-corner kbuilder-corner--tr" aria-hidden="true"></span>

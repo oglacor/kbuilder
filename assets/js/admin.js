@@ -58,9 +58,11 @@
                 .prop('hidden', !wrong)
                 .text(wrong ? i18n.imageSize.replace('%1$s', attachment.width).replace('%2$s', attachment.height) : '');
         } else {
-            const size = attachment && attachment.sizes && (attachment.sizes.medium || attachment.sizes.thumbnail);
-            const url = attachment ? (size || attachment).url : '';
-            $field.find('.kbuilder-texture-chip').css('background-image', url ? `url("${url}")` : '');
+            const sizes = (attachment && attachment.sizes) || {};
+            const swatch = attachment ? (sizes.medium || sizes.thumbnail || attachment).url : '';
+            $field.find('.kbuilder-texture-chip').css('background-image', swatch ? `url("${swatch}")` : '');
+            // The HD version is what the preview paints with.
+            $field.attr('data-url', attachment ? (sizes.large || attachment).url : '').trigger('kbuilder:texture');
         }
     }
 
@@ -139,37 +141,104 @@
 
     // Finish preview -----------------------------------------------------------
 
+    // Paints the finish being edited on the first house model, with the same
+    // renderer as the builder, plus the lens close-up.
     function initFinishForm($form) {
         if (!$form.length) {
             return;
         }
         const $hex = $form.find('.kbuilder-color');
-        const refresh = function (color) {
-            const opacity = Number($form.find('#kbuilder-finish-opacity').val()) / 100;
+        const $texture = $form.find('[data-kbuilder-media="texture"]');
+        const $preview = $form.find('.kbuilder-finish-preview');
+        const LENS_ORDER = ['windows', 'doors', 'walls', 'roof'];
+        let color = $hex.val();
+        let scene = null;
+        let token = 0;
+        let timer = null;
+
+        const sceneReady = function () {
+            if (!scene) {
+                scene = window.KBuilderRecolor.loadImage($preview.data('photo')).then(function (image) {
+                    const result = new window.KBuilderRecolor.Scene(image, $preview.data('width'), $preview.data('height'));
+                    $preview.find('g[data-region]').each(function () {
+                        const shapes = $(this).find('path').map(function () {
+                            const transform = this.transform.baseVal.consolidate();
+                            return { d: this.getAttribute('d'), rule: this.getAttribute('fill-rule') || 'nonzero', matrix: transform ? transform.matrix : null };
+                        }).get();
+                        result.addZone($(this).data('region'), shapes, !!$(this).data('profile'));
+                    });
+                    return result;
+                });
+            }
+            return scene;
+        };
+
+        const render = function () {
+            const current = ++token;
+            const finish = {
+                hex: color || '#FFFFFF',
+                texture: $texture.attr('data-url') || '',
+                scale: Number($form.find('#kbuilder-finish-scale').val()),
+                grain: $form.find('#kbuilder-finish-grain').val(),
+                shading: Number($form.find('#kbuilder-finish-shading').val()) / 100,
+            };
             const zones = $form.find('.kbuilder-finish-zones input:checked').map(function () {
                 return this.value;
-            }).get();
-            $form.find('.kbuilder-opacity-value').text(`${Math.round(opacity * 100)}%`);
-            $form.find('.kbuilder-finish-preview-zone').each(function () {
-                $(this).css({
-                    fill: (typeof color === 'string' && color) || $hex.val() || '#FFFFFF',
-                    opacity: zones.indexOf($(this).data('region')) === -1 ? 0 : opacity,
-                    'mix-blend-mode': $form.find('#kbuilder-finish-blend').val(),
-                });
+            }).get().filter(function (zone) {
+                return $preview.find(`g[data-region="${zone}"]`).length;
             });
+            const layers = zones.map(function (zone) {
+                return { zone: zone, finish: $.extend({}, finish) };
+            });
+            const lensZone = LENS_ORDER.filter(function (zone) {
+                return zones.indexOf(zone) !== -1;
+            })[0];
+
+            sceneReady().then(function (painter) {
+                let lens = null;
+                if (lensZone) {
+                    const $zone = $preview.find(`g[data-region="${lensZone}"]`);
+                    const hint = String($zone.data('hotspot') || '').split(',').map(Number);
+                    const focus = painter.focus(lensZone, hint.length === 2 && !isNaN(hint[0]) ? [hint[0] / 100 * painter.width, hint[1] / 100 * painter.height] : null);
+                    lens = focus ? painter.renderLens(layers, focus[0], focus[1], 72, 360) : null;
+                }
+                return Promise.all([painter.render(layers), lens]).then(function (images) {
+                    if (current !== token) {
+                        return;
+                    }
+                    $preview.find('.kbuilder-finish-preview-house')[0].getContext('2d').putImageData(images[0], 0, 0);
+                    $preview.find('.kbuilder-finish-preview-lens').prop('hidden', !images[1]);
+                    if (images[1]) {
+                        $preview.find('.kbuilder-finish-preview-lens canvas')[0].getContext('2d').putImageData(images[1], 0, 0);
+                        $preview.find('.kbuilder-finish-preview-zone').text($preview.find(`g[data-region="${lensZone}"]`).data('label'));
+                    }
+                });
+            }).catch(function (error) {
+                console.error('[kbuilder]', error);
+            });
+        };
+        const refresh = function () {
+            $form.find('output[for="kbuilder-finish-scale"]').text(`${$form.find('#kbuilder-finish-scale').val()} px`);
+            $form.find('output[for="kbuilder-finish-shading"]').text(`${$form.find('#kbuilder-finish-shading').val()}%`);
+            $form.find('.kbuilder-texture-setting').toggleClass('is-inactive', !$texture.attr('data-url'));
+            if ($preview.length) {
+                clearTimeout(timer);
+                timer = setTimeout(render, 120);
+            }
         };
 
         $hex.wpColorPicker({
             change: function (event, ui) {
-                refresh(ui.color.toString());
+                color = ui.color.toString();
+                refresh();
             },
             clear: function () {
+                color = '';
                 refresh();
             },
         });
-        $form.on('input change', '#kbuilder-finish-opacity, #kbuilder-finish-blend, .kbuilder-finish-zones input', function () {
-            refresh();
-        });
+        $form.on('input change', '#kbuilder-finish-scale, #kbuilder-finish-grain, #kbuilder-finish-shading, .kbuilder-finish-zones input', refresh);
+        $texture.on('kbuilder:texture', refresh);
         refresh();
     }
 })(jQuery);

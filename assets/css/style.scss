@@ -290,16 +290,28 @@ a.kbuilder-exit {
     background: #000;
     box-shadow: 0 0 0 1px $line-strong, 0 30px 80px rgba(0, 0, 0, 0.55);
 
-    svg.kbuilder-canvas {
+    svg.kbuilder-photo {
         display: block;
         width: 100%;
         height: 100%;
         max-width: none;
     }
-    .kbuilder-region {
+    // Layers over the photo: the painted finishes, then the clickable zone outlines.
+    canvas.kbuilder-paint, svg.kbuilder-canvas, svg.kbuilder-lens-link {
+        position: absolute;
+        inset: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        max-width: none;
+    }
+    canvas.kbuilder-paint {
         opacity: 0;
-        transition: opacity 0.5s ease-out, fill 0.5s ease-out;
         pointer-events: none;
+        transition: opacity 0.35s ease-out;
+    }
+    &.is-painted canvas.kbuilder-paint {
+        opacity: 1;
     }
     .kbuilder-outline {
         fill: none;
@@ -323,6 +335,103 @@ a.kbuilder-exit {
                 animation: kb-march 1.2s linear infinite;
             }
         }
+    }
+}
+
+// Lens: close-up of the open zone's finish -----------------------------------
+
+svg.kbuilder-lens-link {
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    line {
+        stroke: var(--kb-red);
+        stroke-width: 1.5px;
+        stroke-dasharray: 6 4;
+        vector-effect: non-scaling-stroke;
+    }
+    circle {
+        fill: rgba(233, 30, 47, 0.25);
+        stroke: #fff;
+        stroke-width: 1.5px;
+        vector-effect: non-scaling-stroke;
+    }
+}
+.kbuilder-lens {
+    position: absolute;
+    z-index: 2;
+    width: 21%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0.85);
+    transition: opacity 0.3s, transform 0.3s, visibility 0s 0.3s;
+
+    canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: #000;
+    }
+    // Ring with glow, and a slow dashed orbit.
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -5px;
+        border-radius: 50%;
+        border: 2px solid var(--kb-red);
+        box-shadow: 0 0 18px rgba(233, 30, 47, 0.55), 0 12px 40px rgba(0, 0, 0, 0.55);
+    }
+    &::after {
+        content: '';
+        position: absolute;
+        inset: -13px;
+        border-radius: 50%;
+        border: 1px dashed rgba(255, 255, 255, 0.4);
+        animation: kb-spin 30s linear infinite;
+    }
+}
+.has-lens {
+    .kbuilder-lens {
+        visibility: visible;
+        opacity: 1;
+        transform: none;
+        transition: opacity 0.3s, transform 0.3s;
+    }
+    svg.kbuilder-lens-link {
+        opacity: 1;
+    }
+}
+p.kbuilder-lens-label {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 20px);
+    padding: 7px 12px;
+    white-space: nowrap;
+    text-align: center;
+    background: rgba(6, 8, 11, 0.85);
+    border-left: 2px solid var(--kb-red);
+    transform: translateX(-50%);
+    span {
+        @include label(9px);
+        display: block;
+        color: $muted;
+    }
+    strong {
+        display: block;
+        margin-top: 3px;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+    }
+    // Lens in a bottom corner: label above it.
+    .kbuilder-lens.is-low & {
+        top: auto;
+        bottom: calc(100% + 20px);
     }
 }
 
@@ -1023,6 +1132,22 @@ body.kbuilder-modal-open {
     }
     .kbuilder-hotspot-label {
         display: none;
+    }
+    .kbuilder-lens {
+        width: 28%;
+        &::after {
+            display: none;
+        }
+    }
+    p.kbuilder-lens-label {
+        top: calc(100% + 8px);
+        padding: 4px 8px;
+        strong {
+            font-size: 12px;
+        }
+    }
+    .kbuilder-lens.is-low p.kbuilder-lens-label {
+        bottom: calc(100% + 8px);
     }
     .kbuilder-models {
         flex-wrap: nowrap;
